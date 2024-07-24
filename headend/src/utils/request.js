@@ -47,13 +47,16 @@ instance.interceptors.response.use(
     // 处理业务失败, 给错误提示，抛出错误
     console.log(1);
     ElMessage.error(res.data.msg || '服务异常')
+    if( res.data.code === '401'){
+      router.push('/login')
+    }
 
     return Promise.reject(res.data)
   },
   (err) => {
     // TODO 5. 处理401错误
     // 错误的特殊情况 => 401 权限不足 或 token 过期 => 拦截到登录
-    if (err.response?.status === 401) {
+    if (err.response?.status === 401 || err.response?.code === 401) {
       router.push('/login')
     }
     // 错误的默认情况 => 只要给提示
