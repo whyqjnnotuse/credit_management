@@ -27,12 +27,30 @@ const params = ref({
 
 // 获取列表
 const getManagementList = async () => {
-  loading.value = true
-  const res = await GetListService(params.value)
-  tableData.value = res.data.data.records
-  console.log(res.data.data)
-  total.value = res.data.data.total
-  loading.value = false
+  try {
+    loading.value = true
+    
+  //   const newParams = {
+  //   ...params,
+  //   handoverTime: formatTime2(params.handoverTime)  
+  // };
+  // console.log(newParams.value);
+    const res = await GetListService(params.value)
+    console.log('res.data.data')
+    console.log(res.data.data)
+
+    if (res.data && res.data.data) {
+      tableData.value = res.data.data.records
+      total.value = res.data.data.total
+    } else {
+      console.error('数据格式不正确', res.data);
+    }
+    loading.value = false
+  } catch (error) {
+    console.error('获取数据失败', error);
+  } finally {
+    loading.value = false
+  }
 }
 getManagementList()
 // 重置
@@ -45,7 +63,8 @@ const onReset = () => {
 
 // 搜索
 const onSearch = () => {
-  // params.value.pageNum = 1
+  console.log('搜索');
+  params.value.pageNum = 1
   getManagementList()
 }
 
@@ -70,10 +89,10 @@ const editManage = async (row) => {
 }
 const save = async () => {
   console.log('保存')
-await EditOrAddService(form.value)
-ElMessage.success('更新成功')
-getManagementList()
-dialogFormVisible.value = false
+  await EditOrAddService(form.value)
+  ElMessage.success('更新成功')
+  getManagementList()
+  dialogFormVisible.value = false
 }
 const delBatch = async () => {
   console.log('批量删除')
@@ -250,6 +269,5 @@ onMounted(() => {
 
 .card {
   border-radius: 10px;
-
 }
 </style>
