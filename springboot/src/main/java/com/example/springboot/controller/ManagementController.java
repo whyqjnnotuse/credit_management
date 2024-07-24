@@ -12,7 +12,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.springboot.common.Result;
 import org.springframework.web.multipart.MultipartFile;
@@ -97,6 +101,26 @@ public class ManagementController {
     public void export(HttpServletResponse response) throws Exception {
         // 从数据库查询出所有的数据
         List<Management> list = managementService.list();
+        // 筛选并映射需要导出的字段
+//        List<Map<String, Object>> exportData = new ArrayList<>();
+//
+//        for (Management management : list) {
+//            Map<String, Object> managementData = new LinkedHashMap<>();
+//            managementData.put("客户代码", management.getUserCode());
+//            managementData.put("客户名称", management.getUsername());
+//            managementData.put("信贷对象", management.getCreditRecipients());
+//            managementData.put("业务品种", management.getOperationType());
+//            managementData.put("借款凭证编号", management.getLoanId());
+//            managementData.put("合同号", management.getContractId());
+//            managementData.put("档案移交时间", management.getHandoverTime());
+////            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+////            dateFormat.format(management.getHandoverTime());
+//            // 添加其他需要导出的字段...
+//            exportData.add(managementData);
+//        }
+
+
+
         // 在内存操作，写出到浏览器
         ExcelWriter writer = ExcelUtil.getWriter(true);
         //自定义标题别名
@@ -108,8 +132,7 @@ public class ManagementController {
         writer.addHeaderAlias("archiveLocation","档案位置");
         writer.addHeaderAlias("contractId","合同号");
         writer.addHeaderAlias("handoverTime","档案移交时间");
-//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-//        dateFormat.format(user.getCreateTime())
+//
         // 一次性写出list内的对象到excel，使用默认样式，强制输出标题
         writer.write(list, true);
 

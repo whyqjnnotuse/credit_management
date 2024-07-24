@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,8 +19,9 @@ import lombok.Setter;
  * @author 
  *
  */
-@Getter
-@Setter
+//@Getter
+//@Setter
+@Data
 @ApiModel(value = "Management对象", description = "")
 public class Management implements Serializable {
 
