@@ -3,6 +3,7 @@ package com.example.springboot.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -41,7 +42,7 @@ public class Management implements Serializable {
 
     private Long contractId;
 
-    private LocalDateTime handoverTime;
+    private LocalDate handoverTime;
 
 
 }

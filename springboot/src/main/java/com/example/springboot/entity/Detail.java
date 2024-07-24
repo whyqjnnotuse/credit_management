@@ -2,7 +2,10 @@ package com.example.springboot.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -25,11 +28,11 @@ public class Detail implements Serializable {
 
     private Long userCode;
 
-    private LocalDateTime lastDate;
+    private LocalDate lastDate;
 
     private String lendingInstitution;
 
-    private LocalDateTime loanDate;
+    private LocalDate loanDate;
 
     private BigDecimal loanAmount;
 

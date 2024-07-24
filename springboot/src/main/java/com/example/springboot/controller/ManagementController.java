@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.springboot.common.Result;
@@ -98,13 +99,23 @@ public class ManagementController {
         List<Management> list = managementService.list();
         // 在内存操作，写出到浏览器
         ExcelWriter writer = ExcelUtil.getWriter(true);
-
+        //自定义标题别名
+        writer.addHeaderAlias("userCode","客户代码");
+        writer.addHeaderAlias("username","客户名称");
+        writer.addHeaderAlias("creditRecipients","信贷对象");
+        writer.addHeaderAlias("operationType","业务品种");
+        writer.addHeaderAlias("loanId","借款凭证编号");
+        writer.addHeaderAlias("archiveLocation","档案位置");
+        writer.addHeaderAlias("contractId","合同号");
+        writer.addHeaderAlias("handoverTime","档案移交时间");
+//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//        dateFormat.format(user.getCreateTime())
         // 一次性写出list内的对象到excel，使用默认样式，强制输出标题
         writer.write(list, true);
 
         // 设置浏览器响应的格式
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8");
-        String fileName = URLEncoder.encode("Management信息表", "UTF-8");
+        String fileName = URLEncoder.encode("档案管理信息表", "UTF-8");
         response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
 
         ServletOutputStream out = response.getOutputStream();
