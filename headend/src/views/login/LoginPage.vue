@@ -58,6 +58,7 @@ const login = async () => {
     console.log(res.data.data);
   // 将token保存到本地
   userStore.setToken(res.data.data.token)
+  localStorage.setItem("credit_user", JSON.stringify(res.data))  // 存储用户信息到浏览器
   // 设置用户信息到Pinia
   userStore.setUser(res.data.data)
   ElMessage.success('登录成功')

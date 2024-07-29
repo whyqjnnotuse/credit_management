@@ -9,13 +9,16 @@ export const userLoginService = ({ username, password }) =>
   request.post('/user/login', { username, password })
 
 // 更新用户信息
-export const userUpdateInfoService = ({ id, nickname, email }) =>
-  request.put('/my/userinfo', { id, nickname, email })
+export const userUpdateInfoService = (data) =>
+  request.post('/user', data)
 
-// 更新头像信息
-export const userUploadAvatarService = (avatar) =>
-  request.patch('/my/update/avatar', { avatar })
+// 获取用户信息
+export const userInfoService = (username) => request.get(`/user/username/${username}`)
+
+// // 更新头像信息
+// export const userUploadAvatarService = (avatar) =>
+//   request.patch('/my/update/avatar', { avatar })
 
 // 更新密码信息
-export const userUpdatePassService = ({ old_pwd, new_pwd, re_pwd }) =>
-  request.patch('/my/updatepwd', { old_pwd, new_pwd, re_pwd })
+export const userUpdatePassService = (data) =>
+  request.post('/user/password', data)

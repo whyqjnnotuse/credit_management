@@ -13,6 +13,8 @@ import avatar from '@/assets/default.png'
 import { useUserStore } from '@/stores'
 import { useRouter } from 'vue-router'
 import { ref } from 'vue'
+const user = ref(localStorage.getItem("credit_user") ? JSON.parse(localStorage.getItem("credit_user")) : {})
+const avatarUrl = ref(user.value.data.avatarUrl)
 const userStore = useUserStore()
 const router = useRouter()
 // onMounted(() => {
@@ -81,12 +83,6 @@ const opens =ref(localStorage.getItem("menus") ? JSON.parse(localStorage.getItem
             </el-icon>
             <span>基本资料</span>
           </el-menu-item>
-          <el-menu-item index="/user/avatar">
-            <el-icon>
-              <Crop />
-            </el-icon>
-            <span>更换头像</span>
-          </el-menu-item>
           <el-menu-item index="/user/password">
             <el-icon>
               <EditPen />
@@ -105,7 +101,7 @@ const opens =ref(localStorage.getItem("menus") ? JSON.parse(localStorage.getItem
         </div>
         <el-dropdown placement="bottom-end" @command="handleCommand">
           <span class="el-dropdown__box">
-            <el-avatar :src="userStore.user.user_pic || avatar" />
+            <el-avatar :src="avatarUrl || avatar" />
             <el-icon>
               <CaretBottom />
             </el-icon>
@@ -114,9 +110,6 @@ const opens =ref(localStorage.getItem("menus") ? JSON.parse(localStorage.getItem
             <el-dropdown-menu>
               <el-dropdown-item command="profile" :icon="User"
                 >基本资料</el-dropdown-item
-              >
-              <el-dropdown-item command="avatar" :icon="Crop"
-                >更换头像</el-dropdown-item
               >
               <el-dropdown-item command="password" :icon="EditPen"
                 >重置密码</el-dropdown-item

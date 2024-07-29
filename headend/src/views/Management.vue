@@ -2,7 +2,7 @@
 import { useUserStore } from '@/stores'
 import { useRouter } from 'vue-router'
 // import moment from 'moment';
-import { ref, reactive, onMounted, nextTick } from 'vue'
+import { ref, reactive, onMounted, watch, nextTick } from 'vue'
 import { Edit, Delete } from '@element-plus/icons-vue'
 import { formatTime, formatTime2 } from '@/utils/format.js'
 import { GetListService, DelbatchListService, DelService, EditOrAddService, ExportService } from '@/api/management'
@@ -10,6 +10,7 @@ import { GetListService, DelbatchListService, DelService, EditOrAddService, Expo
 const tableData = ref([])
 const loading = ref(false)
 const form = ref({})
+const formRef = ref(null);
 const dialogFormVisible = ref(false)
 const multipleSelection = ref([])
 const user = reactive(localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : {})
@@ -24,17 +25,48 @@ const params = ref({
   username: '',
   creditRecipients: ''
 })
-
+// 表单验证规则
+const rules = {
+  creditRecipients: [
+    { required: true, message: '请输入放款机构', trigger: 'blur' }
+  ],
+  username: [
+    { required: true, message: '请输入客户名称', trigger: 'blur' },
+    { min: 2, max: 6, message: '长度在 2 到 6 个字符', trigger: 'blur' }
+  ],
+  userCode: [
+    { required: true, message: '请输入客户代码', trigger: 'blur' },
+    // { type: 'number',min: 3, max: 20, message: '客户代码必须为数字', trigger: 'blur' }
+  ],
+  loanId: [
+    { required: true, message: '请输入借款凭证编号', trigger: 'blur' },
+    // { type: 'number',min: 3, max: 20, message: '借款合同编号必须为数字', trigger: 'blur' }
+  ],
+  archiveLocation: [
+    { required: true, message: '请输入档案位置', trigger: 'blur' },
+  ],
+  operationType: [
+    { required: true, message: '请输入业务品种', trigger: 'blur' }
+  ],
+  contractId: [
+    { required: true, message: '请输入合同号', trigger: 'blur' },
+    // { type: 'number', message: '合同号必须为数字' }
+  ],
+  handoverTime: [
+    { required: true, message: '请选择档案移交时间', trigger: 'blur' }
+  ]
+}
 // 获取列表
 const getManagementList = async () => {
   try {
     loading.value = true
-    
   //   const newParams = {
   //   ...params,
   //   handoverTime: formatTime2(params.handoverTime)  
   // };
   // console.log(newParams.value);
+  console.log('params.value')
+    console.log(params.value)
     const res = await GetListService(params.value)
     console.log('res.data.data')
     console.log(res.data.data)
@@ -52,7 +84,6 @@ const getManagementList = async () => {
     loading.value = false
   }
 }
-getManagementList()
 // 重置
 const onReset = () => {
   params.value.pageNum = 1
@@ -82,17 +113,25 @@ const editManage = async (row) => {
     ...row,
     handoverTime: formatTime2(row.handoverTime)  // 假设 dateField 是你需要格式化的日期字段
   };
-
   form.value = { ...formattedRow };
   console.log(form.value)
   console.log(1111);
 }
 const save = async () => {
   console.log('保存')
-  await EditOrAddService(form.value)
-  ElMessage.success('更新成功')
-  getManagementList()
-  dialogFormVisible.value = false
+  formRef.value.validate( async(valid) => {
+    if (valid) {
+      // Submit form
+      await EditOrAddService(form.value)
+      ElMessage.success('更新成功')
+      getManagementList()
+      dialogFormVisible.value = false;
+      formRef.value.resetFields();
+    } else {
+      console.log('error submit!!');
+      return false;
+    }
+  });
 }
 const delBatch = async () => {
   console.log('批量删除')
@@ -131,6 +170,14 @@ const handleSelectionChange = (val) => {
   console.log(val)
   multipleSelection.value = val
 }
+const cancel = () => {
+  dialogFormVisible.value = false;
+      formRef.value.resetFields();
+}
+const closeDialog = () => {
+  dialogFormVisible.value = false;
+      formRef.value.resetFields();
+}
 // 处理分页逻辑
 const handleSizeChange = (pageSize) => {
   // console.log('每页条数变化了' + size)
@@ -150,15 +197,23 @@ const handleCurrentChange = (pageNum) => {
 onMounted(() => {
   getManagementList()
 })
+
+// watch(dialogFormVisible, (newVal) => {
+//   if (newVal) {
+//     nextTick(() => {
+//       if (formRef.value) {
+//         formRef.value.resetFields();
+//       }
+//     });
+//   }
+// });
+// watch(dialogFormVisible, () => {
+//   formRef.value.resetFields()
+// })   
 </script>
 <template>
-  <!-- <div style="margin: 10px 0">
-      <el-input style="width: 200px" placeholder="请输入名称" suffix-icon="el-icon-search" v-model="params.name"></el-input>
-      <el-button class="ml-5" type="primary" @click="load">搜索</el-button>
-      <el-button type="warning" @click="reset">重置</el-button>
-    </div> -->
-  <!-- 表单区域 -->
   <el-card shadow="always" class="card">
+    <!-- 表单区域 -->
     <el-form inline>
       <el-form-item label="客户名称">
         <el-input v-model="params.username" placeholder="请输入客户名称"></el-input>
@@ -166,7 +221,7 @@ onMounted(() => {
       <el-form-item label="信贷对象">
         <el-select v-model="params.creditRecipients" style="width:105px">
           <el-option label="个人" value="个人"></el-option>
-          <el-option label="企业" value="企业"></el-option>
+          <el-option label="法人" value="法人"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -197,7 +252,7 @@ onMounted(() => {
       </el-popconfirm> -->
 
     <!-- </div> -->
-    <!-- 表单区域 -->
+    <!-- 表格区域 -->
     <el-table :data="tableData" border stripe :header-cell-class-name="'headerBg'"
       @selection-change="handleSelectionChange" v-loading="loading">
       <el-table-column type="selection" width="55"></el-table-column>
@@ -226,8 +281,8 @@ onMounted(() => {
       background layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange"
       @current-change="handleCurrentChange" style="margin-top: 25px; justify-content: flex-end" />
     <!-- 对话框 -->
-    <el-dialog :title="title" v-model="dialogFormVisible" width="40%" :close-on-click-modal="false">
-      <el-form label-width="120px" size="small" style="width: 80%; margin: 0 auto">
+    <el-dialog :title="title" v-model="dialogFormVisible" width="40%"  :before-close="closeDialog">
+      <el-form :model="form" :rules="rules" ref="formRef" label-width="120px" size="small" style="width: 80%; margin: 0 auto">
         <el-form-item prop="userCode" label="客户代码">
           <el-input v-model="form.userCode" autocomplete="off"></el-input>
         </el-form-item>
@@ -255,7 +310,7 @@ onMounted(() => {
 
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button @click="cancel">取 消</el-button>
         <el-button type="primary" @click="save">确 定</el-button>
       </div>
     </el-dialog>
@@ -269,5 +324,6 @@ onMounted(() => {
 
 .card {
   border-radius: 10px;
+  min-height: 550px;
 }
 </style>

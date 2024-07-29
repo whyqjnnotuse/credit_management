@@ -1,246 +1,323 @@
-<template>
-  <div>
-    <div style="margin: 10px 0">
-      <el-input style="width: 200px" placeholder="请输入名称" suffix-icon="el-icon-search" v-model="name"></el-input>
-<!--      <el-input style="width: 200px" placeholder="请输入" suffix-icon="el-icon-message" class="ml-5" v-model="email"></el-input>-->
-<!--      <el-input style="width: 200px" placeholder="请输入" suffix-icon="el-icon-position" class="ml-5" v-model="address"></el-input>-->
-      <el-button class="ml-5" type="primary" @click="load">搜索</el-button>
-      <el-button type="warning" @click="reset">重置</el-button>
-    </div>
+<script setup>
+import { useUserStore } from '@/stores'
+import { useRouter } from 'vue-router'
+import { ref, reactive, onMounted,watch, nextTick } from 'vue'
+import { Edit, Delete } from '@element-plus/icons-vue'
+import { formatTime, formatTime2 } from '@/utils/format.js'
+import { GetListService, DelbatchListService, DelService, EditOrAddService, ExportService } from '@/api/detail'
 
-    <div style="margin: 10px 0">
-      <el-button type="primary" @click="handleAdd">新增 <i class="el-icon-circle-plus-outline"></i></el-button>
-      <el-popconfirm
-          class="ml-5"
-          confirm-button-text='确定'
-          cancel-button-text='我再想想'
-          icon="el-icon-info"
-          icon-color="red"
-          title="您确定批量删除这些数据吗？"
-          @confirm="delBatch"
-      >
-        <el-button type="danger" slot="reference">批量删除 <i class="el-icon-remove-outline"></i></el-button>
-      </el-popconfirm>
-      <!-- <el-upload action="http://localhost:9090/detail/import" :show-file-list="false" accept="xlsx" :on-success="handleExcelImportSuccess" style="display: inline-block">
-        <el-button type="primary" class="ml-5">导入 <i class="el-icon-bottom"></i></el-button>
-      </el-upload>
-      <el-button type="primary" @click="exp" class="ml-5">导出 <i class="el-icon-top"></i></el-button> -->
-    </div>
+const tableData = ref([])
+const loading = ref(false)
+const form = ref({})
+const formRef = ref(null);
+const dialogFormVisible = ref(false)
+const multipleSelection = ref([])
+const user = reactive(localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : {})
+const router = useRouter()
+const store = useUserStore()
+const title = ref('')
+// 总条数
+const total = ref(0)
+const params = ref({
+  pageNum: 1,
+  pageSize: 10,
+  clientName: '',
+  businessVariety: ''
+})
+// 表单验证规则
+const rules = {
+  lendingInstitution: [
+    { required: true, message: '请输入放款机构', trigger: 'blur' }
+  ],
+  clientName: [
+    { required: true, message: '请输入客户名称', trigger: 'blur' },
+    { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
+  ],
+  userCode: [
+    { required: true, message: '请输入客户代码', trigger: 'blur' },
+    // { type: 'number',min: 3, max: 20, message: '客户代码必须为数字', trigger: 'blur' }
+  ],
+  loanContractId: [
+    { required: true, message: '请输入借款合同编号', trigger: 'blur' },
+    // { type: 'number',min: 3, max: 20, message: '借款合同编号必须为数字', trigger: 'blur' }
+  ],
+  loanVoucherId: [
+    { required: true, message: '请输入借款凭证编号', trigger: 'blur' },
+    // { type: 'number',min: 3, max: 20, message: '借款凭证编号必须为数字', trigger: 'blur' }
+  ],
+  businessVariety: [
+    { required: true, message: '请输入业务品种', trigger: 'blur' }
+  ],
+  loanAmount: [
+    { required: true, message: '请输入借款金额', trigger: 'blur' },
+    // { type: 'number', message: '借款金额必须为数字' }
+  ],
+  loanDate: [
+    { required: true, message: '请选择借款日期', trigger: 'blur' }
+  ],
+  lastDate: [
+    { required: true, message: '请选择到期日期', trigger: 'blur' }
+  ]
+}
 
-    <el-table :data="tableData" border stripe :header-cell-class-name="'headerBg'"  @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55"></el-table-column>
-      <el-table-column prop="id" label="ID" width="80" sortable></el-table-column>
-      <el-table-column prop="userCode" label="客户代码"></el-table-column>
-      <el-table-column prop="lastDate" label=""></el-table-column>
-      <el-table-column prop="lendingInstitution" label=""></el-table-column>
-      <el-table-column prop="loanDate" label=""></el-table-column>
-      <el-table-column prop="loanAmount" label=""></el-table-column>
-      <el-table-column prop="clientName" label=""></el-table-column>
-      <el-table-column prop="loanContractId" label=""></el-table-column>
-      <el-table-column prop="loanVoucherId" label=""></el-table-column>
-      <el-table-column prop="businessVariety" label=""></el-table-column>
+// 获取列表
+const getDetailList = async () => {
+  try {
+    loading.value = true
+    console.log('params.value')
+    console.log(params.value)
+    const res = await GetListService(params.value)
+    console.log('res.data.data')
+    console.log(res.data.data)
 
-      <el-table-column label="操作"  width="180" align="center">
-        <template slot-scope="scope">
-          <el-button type="success" @click="handleEdit(scope.row)">编辑 <i class="el-icon-edit"></i></el-button>
-          <el-popconfirm
-              class="ml-5"
-              confirm-button-text='确定'
-              cancel-button-text='我再想想'
-              icon="el-icon-info"
-              icon-color="red"
-              title="您确定删除吗？"
-              @confirm="del(scope.row.id)"
-          >
-            <el-button type="danger" slot="reference">删除 <i class="el-icon-remove-outline"></i></el-button>
-          </el-popconfirm>
-        </template>
-      </el-table-column>
-    </el-table>
-    <div style="padding: 10px 0">
-      <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page="pageNum"
-          :page-sizes="[2, 5, 10, 20]"
-          :page-size="pageSize"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="total">
-      </el-pagination>
-    </div>
-
-    <el-dialog title="信息" :visible.sync="dialogFormVisible" width="40%" :close-on-click-modal="false">
-      <el-form label-width="120px" size="small" style="width: 80%; margin: 0 auto">
-        <el-form-item prop="userCode" label="">
-          <el-input v-model="form.userCode" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item prop="lastDate" label="">
-          <el-date-picker v-model="form.lastDate" type="date" value-format="yyyy-MM-dd" placeholder="选择日期"></el-date-picker>
-        </el-form-item>
-        <el-form-item prop="lendingInstitution" label="">
-          <el-input v-model="form.lendingInstitution" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item prop="loanDate" label="">
-          <el-date-picker v-model="form.loanDate" type="date" value-format="yyyy-MM-dd" placeholder="选择日期"></el-date-picker>
-        </el-form-item>
-        <el-form-item prop="loanAmount" label="">
-          <el-input v-model="form.loanAmount" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item prop="clientName" label="">
-          <el-input v-model="form.clientName" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item prop="loanContractId" label="">
-          <el-input v-model="form.loanContractId" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item prop="loanVoucherId" label="">
-          <el-input v-model="form.loanVoucherId" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item prop="businessVariety" label="">
-          <el-input v-model="form.businessVariety" autocomplete="off"></el-input>
-        </el-form-item>
-
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="save">确 定</el-button>
-      </div>
-    </el-dialog>
-  </div>
-</template>
-
-<script>
-export default {
-  name: "Detail",
-  data() {
-    return {
-      tableData: [],
-      total: 0,
-      pageNum: 1,
-      pageSize: 10,
-      name: "",
-      form: {},
-      dialogFormVisible: false,
-      multipleSelection: [],
-      user: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : {}
+    if (res.data && res.data.data) {
+      tableData.value = res.data.data.records
+      total.value = res.data.data.total
+    } else {
+      console.error('数据格式不正确', res.data);
     }
-  },
-  created() {
-    this.load()
-  },
-  methods: {
-    load() {
-      this.request.get("/detail/page", {
-        params: {
-          pageNum: this.pageNum,
-          pageSize: this.pageSize,
-          name: this.name,
-        }
-      }).then(res => {
-        this.tableData = res.data.records
-        this.total = res.data.total
-      })
-    },
-    save() {
-      this.request.post("/detail", this.form).then(res => {
-        if (res.code === '200') {
-          this.$message.success("保存成功")
-          this.dialogFormVisible = false
-          this.load()
-        } else {
-          this.$message.error("保存失败")
-        }
-      })
-    },
-    handleAdd() {
-      this.dialogFormVisible = true
-      this.form = {}
-      this.$nextTick(() => {
-        if(this.$refs.img) {
-           this.$refs.img.clearFiles();
-         }
-         if(this.$refs.file) {
-          this.$refs.file.clearFiles();
-         }
-      })
-    },
-    handleEdit(row) {
-      this.form = JSON.parse(JSON.stringify(row))
-      this.dialogFormVisible = true
-       this.$nextTick(() => {
-         if(this.$refs.img) {
-           this.$refs.img.clearFiles();
-         }
-         if(this.$refs.file) {
-          this.$refs.file.clearFiles();
-         }
-       })
-    },
-    del(id) {
-      this.request.delete("/detail/" + id).then(res => {
-        if (res.code === '200') {
-          this.$message.success("删除成功")
-          this.load()
-        } else {
-          this.$message.error("删除失败")
-        }
-      })
-    },
-    handleSelectionChange(val) {
-      console.log(val)
-      this.multipleSelection = val
-    },
-    delBatch() {
-      if (!this.multipleSelection.length) {
-        this.$message.error("请选择需要删除的数据")
-        return
-      }
-      let ids = this.multipleSelection.map(v => v.id)  // [{}, {}, {}] => [1,2,3]
-      this.request.post("/detail/del/batch", ids).then(res => {
-        if (res.code === '200') {
-          this.$message.success("批量删除成功")
-          this.load()
-        } else {
-          this.$message.error("批量删除失败")
-        }
-      })
-    },
-    reset() {
-      this.name = ""
-      this.load()
-    },
-    handleSizeChange(pageSize) {
-      console.log(pageSize)
-      this.pageSize = pageSize
-      this.load()
-    },
-    handleCurrentChange(pageNum) {
-      console.log(pageNum)
-      this.pageNum = pageNum
-      this.load()
-    },
-    handleFileUploadSuccess(res) {
-      this.form.file = res
-    },
-    handleImgUploadSuccess(res) {
-      this.form.img = res
-    },
-    download(url) {
-      window.open(url)
-    },
-    exp() {
-      window.open("http://localhost:9090/detail/export")
-    },
-    handleExcelImportSuccess() {
-      this.$message.success("导入成功")
-      this.load()
-    }
+    loading.value = false
+  } catch (error) {
+    console.error('获取数据失败', error);
+  } finally {
+    loading.value = false
   }
+}
+// 重置
+const onReset = () => {
+  params.value.pageNum = 1
+  params.value.clientName = ''
+  params.value.businessVariety = ''
+  getDetailList()
+}
+
+// 搜索
+const onSearch = () => {
+  console.log('搜索');
+  params.value.pageNum = 1
+  getDetailList()
+}
+
+const addManage = () => {
+  title.value = '添加'
+  form.value = {}
+  dialogFormVisible.value = true
+  console.log('add')
+}
+
+const editManage = async (row) => {
+  title.value = '编辑'
+  dialogFormVisible.value = true
+  const formattedRow = {
+    ...row,
+    loanDate: formatTime2(row.loanDate),
+    lastDate: formatTime2(row.lastDate)
+  };
+  form.value = { ...formattedRow };
+  console.log(form.value)
+  console.log(1111);
+}
+const save =  () => {
+  console.log('保存')
+  formRef.value.validate( async(valid) => {
+    if (valid) {
+      // Submit form
+      await EditOrAddService(form.value)
+      ElMessage.success('更新成功')
+      getDetailList()
+      dialogFormVisible.value = false;
+      formRef.value.resetFields();
+    } else {
+      console.log('error submit!!');
+      return false;
+    }
+  });
+}
+const delBatch = async () => {
+  console.log('批量删除')
+  console.log(multipleSelection.value.length);
+  if (!multipleSelection.value.length) {
+    ElMessage.error("请选择需要删除的数据")
+    return
+  }
+  await ElMessageBox.confirm('你确认批量删除这些信息吗？', '温馨提示', {
+    type: 'warning',
+    confirmButtonText: '确认',
+    cancelButtonText: '取消'
+  })
+  let ids = multipleSelection.value?.map(v => v.id)  // [{}, {}, {}] => [1,2,3]
+  await DelbatchListService(ids)
+  ElMessage({ type: 'success', message: '批量删除成功' })
+  getDetailList()
+}
+const deleteManage = async (row) => {
+  await ElMessageBox.confirm('你确认删除该信息吗？', '温馨提示', {
+    type: 'warning',
+    confirmButtonText: '确认',
+    cancelButtonText: '取消'
+  })
+  await DelService(row.id)
+  ElMessage({ type: 'success', message: '删除成功' })
+  getDetailList()
+  console.log('删除')
+}
+// 导出
+const exp = () => {
+  window.open("http://localhost:9090/detail/export")
+}
+// 选择项
+const handleSelectionChange = (val) => {
+  console.log(val)
+  multipleSelection.value = val
+}
+// 处理分页逻辑
+const handleSizeChange = (pageSize) => {
+  // console.log('每页条数变化了' + size)
+  // 只要每页条数变化了，访问的本页面就无意义了，要回到第一页
+  params.value.pageNum = 1
+  params.value.pageSize = pageSize
+  // 基于当前的最新页和码数更新
+  getDetailList()
+}
+const handleCurrentChange = (pageNum) => {
+  // console.log('页码变化了' + page)
+  // 基于最新的当前页渲染数据
+  params.value.pageNum = pageNum
+  getDetailList()
+}
+
+onMounted(() => {
+  getDetailList()
+})
+// 关闭对话框
+const cancel = () => {
+  dialogFormVisible.value = false;
+      formRef.value.resetFields();
+}
+
+const closeDialog = () => {
+  dialogFormVisible.value = false;
+      formRef.value.resetFields();
+}
+// 导入
+const handleExcelImportSuccess = () => {
+  ElMessage.success('导入成功')
+  getDetailList()
 }
 </script>
 
+<template>
+  <el-card shadow="always" class="card">
+    <el-form inline>
+      <el-form-item label="客户名称">
+        <el-input v-model="params.clientName" placeholder="请输入客户名称"></el-input>
+      </el-form-item>
+      <el-form-item label="业务品种">
+        <el-select v-model="params.businessVariety" style="width:105px">
+          <el-option label="二手房贷款1" value="二手房贷款1"></el-option>
+          <el-option label="二手房贷款2" value="二手房贷款2"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button @click="onSearch" type="primary">搜索</el-button>
+        <el-button @click="onReset">重置</el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="addManage">添加客户</el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="danger" slot="reference" @click="delBatch">批量删除 <i
+            class="el-icon-remove-outline"></i></el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-upload action="http://localhost:9090/detail/import" :show-file-list="false" accept="xlsx"
+          :on-success="handleExcelImportSuccess" style="display: inline-block">
+          <el-button type="primary" class="ml-5">导入 <i class="el-icon-bottom"></i></el-button>
+        </el-upload>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="exp" class="ml-5">导出 <i class="el-icon-top"></i></el-button>
+      </el-form-item>
+    </el-form>
+    <!-- 表格区域 -->
+    <el-table :data="tableData" border stripe :header-cell-class-name="'headerBg'"
+      @selection-change="handleSelectionChange">
+      <el-table-column type="selection" width="55"></el-table-column>
+      <!-- <el-table-column prop="id" label="ID" width="80" sortable></el-table-column> -->
+      <el-table-column prop="lendingInstitution" label="放款机构"></el-table-column>
+      <el-table-column prop="clientName" label="客户名称" width="100"></el-table-column>
+      <el-table-column prop="userCode" label="客户代码"></el-table-column>
+      <el-table-column prop="loanContractId" label="借款合同编号"></el-table-column>
+      <el-table-column prop="loanVoucherId" label="借款凭证编号"></el-table-column>
+      <el-table-column prop="businessVariety" label="业务品种"></el-table-column>
+      <el-table-column prop="loanAmount" label="借款金额" sortable></el-table-column>
+      <el-table-column prop="loanDate" label="借款日期" sortable>
+        <template #default="{ row }">
+          {{ formatTime(row.loanDate) }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="lastDate" label="到期日期" sortable>
+        <template #default="{ row }">
+          {{ formatTime(row.lastDate) }}
+        </template>
+      </el-table-column>
+      <el-table-column label="操作">
+        <template #default="{ row, $index }">
+          <el-button type="primary" :icon="Edit" circle plain @click="editManage(row, $index)"></el-button>
+          <el-button type="danger" :icon="Delete" circle plain @click="deleteManage(row, $index)"></el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <!-- 分页区域 -->
+    <el-pagination v-model:current-page="params.pageNum" v-model:page-size="params.pageSize" :page-sizes="[1, 2, 5, 10]"
+      background layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange"
+      @current-change="handleCurrentChange" style="margin-top: 25px; justify-content: flex-end" />
+    <!-- 对话框 -->
+    <el-dialog :title="title" v-model="dialogFormVisible" width="40%" :before-close="closeDialog" :close-on-click-modal="false">
+      <el-form :model="form" :rules="rules" ref="formRef" label-width="120px" size="small" style="width: 80%; margin: 0 auto">
+        <el-form-item prop="lendingInstitution" label="放款机构">
+          <el-input v-model="form.lendingInstitution" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item prop="clientName" label="客户名称">
+          <el-input v-model="form.clientName" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item prop="userCode" label="客户代码">
+          <el-input v-model="form.userCode" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item prop="loanContractId" label="借款合同编号">
+          <el-input v-model="form.loanContractId" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item prop="loanVoucherId" label="借款凭证编号">
+          <el-input v-model="form.loanVoucherId" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item prop="businessVariety" label="业务品种">
+          <el-input v-model="form.businessVariety" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item prop="loanAmount" label="借款金额">
+          <el-input v-model="form.loanAmount" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item prop="loanDate" label="借款日期">
+          <el-date-picker v-model="form.loanDate" type="date" placeholder="选择日期"></el-date-picker>
+        </el-form-item>
+        <el-form-item prop="lastDate" label="到期日期">
+          <el-date-picker v-model="form.lastDate" type="date" placeholder="选择日期"></el-date-picker>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="cancel">取 消</el-button>
+        <el-button type="primary" @click="save">确 定</el-button>
+      </div>
+    </el-dialog>
+  </el-card>
+</template>
 
-<style>
+<style scoped>
 .headerBg {
-  background: #eee!important;
+  background: #eee !important;
+}
+
+.card {
+  border-radius: 10px;
+  min-height: 550px;
 }
 </style>

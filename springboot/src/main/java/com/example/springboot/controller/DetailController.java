@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletOutputStream;
 import java.net.URLEncoder;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+//import jdk.internal.icu.impl.StringPrepDataReader;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.io.InputStream;
@@ -22,6 +23,10 @@ import com.example.springboot.service.IDetailService;
 import com.example.springboot.entity.Detail;
 
 import org.springframework.web.bind.annotation.RestController;
+
+import com.alibaba.excel.EasyExcel;
+import java.io.File;
+import java.util.List;
 
 /**
  * <p>
@@ -98,13 +103,23 @@ public class DetailController {
         List<Detail> list = detailService.list();
         // 在内存操作，写出到浏览器
         ExcelWriter writer = ExcelUtil.getWriter(true);
+        //自定义标题别名
+        writer.addHeaderAlias("lendingInstitution","放款机构");
+        writer.addHeaderAlias("clientName","客户名称");
+        writer.addHeaderAlias("userCode","客户代码");
+        writer.addHeaderAlias("loanContractId","借款合同编号");
+        writer.addHeaderAlias("loanVoucherId","借款凭证编号");
+        writer.addHeaderAlias("businessVariety","业务品种");
+        writer.addHeaderAlias("loanAmount","借款金额");
+        writer.addHeaderAlias("loanDate","借款日期");
+        writer.addHeaderAlias("lastDate","到期日期");
 
         // 一次性写出list内的对象到excel，使用默认样式，强制输出标题
         writer.write(list, true);
 
         // 设置浏览器响应的格式
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8");
-        String fileName = URLEncoder.encode("Detail信息表", "UTF-8");
+        String fileName = URLEncoder.encode("档案入库信息表", "UTF-8");
         response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
 
         ServletOutputStream out = response.getOutputStream();
@@ -124,8 +139,11 @@ public class DetailController {
         InputStream inputStream = file.getInputStream();
         ExcelReader reader = ExcelUtil.getReader(inputStream);
         // 通过 javabean的方式读取Excel内的对象，但是要求表头必须是英文，跟javabean的属性要对应起来
-        List<Detail> list = reader.readAll(Detail.class);
-
+//        List<Detail> list = reader.readAll(Detail.class);
+        List<Detail> list = EasyExcel.read(inputStream).head(Detail.class).sheet().doReadSync();
+        for (Detail detail : list) {
+            System.out.println(detail);
+        }
         detailService.saveBatch(list);
         return Result.success();
     }

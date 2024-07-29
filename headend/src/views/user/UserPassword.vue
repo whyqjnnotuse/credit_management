@@ -3,16 +3,18 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores'
 import { userUpdatePassService } from '@/api/user'
+const user = ref(localStorage.getItem("credit_user") ? JSON.parse(localStorage.getItem("credit_user")) : {})
 const formRef = ref()
 
 const pwdForm = ref({
-  old_pwd: '',
-  new_pwd: '',
-  re_pwd: ''
+  username:'',
+  password: '',
+  newPassword: '',
+  confirmPassword: ''
 })
 // 校验函数
 const checkOldSame = (rule, value, cb) => {
-  if (value === pwdForm.value.old_pwd) {
+  if (value === pwdForm.value.password) {
     cb(new Error('原密码和新密码不能一样!'))
   } else {
     cb()
@@ -20,7 +22,7 @@ const checkOldSame = (rule, value, cb) => {
 }
 // 校验函数
 const checkNewSame = (rule, value, cb) => {
-  if (value !== pwdForm.value.new_pwd) {
+  if (value !== pwdForm.value.newPassword) {
     cb(new Error('新密码和确认再次输入的新密码不一样!'))
   } else {
     cb()
@@ -28,30 +30,30 @@ const checkNewSame = (rule, value, cb) => {
 }
 const rules = {
   // 原密码
-  old_pwd: [
+  password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
     {
-      pattern: /^\S{6,15}$/,
-      message: '密码长度必须是6-15位的非空字符串',
+      pattern: /^\S{3,15}$/,
+      message: '密码长度必须是3-15位的非空字符串',
       trigger: 'blur'
     }
   ],
   // 新密码
-  new_pwd: [
+  newPassword: [
     { required: true, message: '请输入新密码', trigger: 'blur' },
     {
-      pattern: /^\S{6,15}$/,
-      message: '密码长度必须是6-15位的非空字符串',
+      pattern: /^\S{3,15}$/,
+      message: '密码长度必须是3-15位的非空字符串',
       trigger: 'blur'
     },
     { validator: checkOldSame, trigger: 'blur' }
   ],
   // 确认新密码
-  re_pwd: [
+  confirmPassword: [
     { required: true, message: '请再次确认新密码', trigger: 'blur' },
     {
-      pattern: /^\S{6,15}$/,
-      message: '密码长度必须是6-15位的非空字符串',
+      pattern: /^\S{3,15}$/,
+      message: '密码长度必须是3-15位的非空字符串',
       trigger: 'blur'
     },
     { validator: checkNewSame, trigger: 'blur' }
@@ -62,6 +64,8 @@ const router = useRouter()
 const onSubmit = async () => {
   const valid = await formRef.value.validate()
   if (valid) {
+    pwdForm.value.username = user.value.data.username
+    // pwdForm.value.password = user.value.password
     await userUpdatePassService(pwdForm.value)
     ElMessage({ type: 'success', message: '更换密码成功' })
     userStore.setToken('')
@@ -84,23 +88,23 @@ const onReset = () => {
           label-width="100px"
           size="large"
         >
-          <el-form-item label="原密码" prop="old_pwd">
+          <el-form-item label="原密码" prop="password">
             <el-input
-              v-model="pwdForm.old_pwd"
+              v-model="pwdForm.password"
               type="password"
               show-password
             ></el-input>
           </el-form-item>
-          <el-form-item label="新密码" prop="new_pwd">
+          <el-form-item label="新密码" prop="newPassword">
             <el-input
-              v-model="pwdForm.new_pwd"
+              v-model="pwdForm.newPassword"
               type="password"
               show-password
             ></el-input>
           </el-form-item>
-          <el-form-item label="确认新密码" prop="re_pwd">
+          <el-form-item label="确认新密码" prop="confirmPassword">
             <el-input
-              v-model="pwdForm.re_pwd"
+              v-model="pwdForm.confirmPassword"
               type="password"
               show-password
             ></el-input>

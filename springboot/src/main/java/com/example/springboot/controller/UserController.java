@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.springboot.config.interceptor.AuthAccess;
 import com.example.springboot.controller.dto.UserDTO;
 import com.example.springboot.controller.dto.UserPasswordDTO;
+import com.example.springboot.controller.dto.UserProfileDto;
 import com.example.springboot.entity.User;
 import com.example.springboot.exception.ServiceException;
 import com.example.springboot.service.IUserService;
@@ -142,7 +143,23 @@ public class UserController {
         queryWrapper.eq("username", username);
         return Result.success(userService.getOne(queryWrapper));
     }
-
+    /**
+     * 修改基本资料
+     */
+//    @PutMapping("/profile")
+//    public Result updateProfile(@RequestBody UserProfileDto userProfileDto) {
+//        // 假设UserProfileDto包含username, nickname, email字段
+//        User user = userService.findByUsername(userProfileDto.getUsername());
+//        if (user == null) {
+//            return Result.failure("用户不存在");
+//        }
+//
+//        user.setNickname(userProfileDto.getNickname());
+//        user.setEmail(userProfileDto.getEmail());
+//        userService.updateById(user);
+//
+//        return Result.success(user);
+//    }
     @GetMapping("/page")
     public Result findPage(@RequestParam Integer pageNum,
                            @RequestParam Integer pageSize,
