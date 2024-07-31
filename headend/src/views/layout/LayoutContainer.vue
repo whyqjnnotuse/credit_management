@@ -5,6 +5,11 @@ import {
   Management,
   UserFilled,
   Crop,
+  Avatar,
+  List,
+  Key,
+  Setting,
+  Grid,
   EditPen,
   CaretBottom,
   SwitchButton
@@ -39,21 +44,16 @@ const handleCommand = async (key) => {
   }
 }
 
-const menus =ref(localStorage.getItem("menus") ? JSON.parse(localStorage.getItem("menus")) : []) 
-const opens =ref(localStorage.getItem("menus") ? JSON.parse(localStorage.getItem("menus")).map(v => v.id + '') : [])
+const menus = ref(localStorage.getItem("menus") ? JSON.parse(localStorage.getItem("menus")) : [])
+const opens = ref(localStorage.getItem("menus") ? JSON.parse(localStorage.getItem("menus")).map(v => v.id + '') : [])
 </script>
 <template>
   <el-container class="layout-container">
     <el-aside width="200px">
       <div class="el-aside__logo"></div>
-      <el-menu
-        active-text-color="#ffd04b"
-        background-color="#232323"
-        :default-active="$route.path"
-        text-color="#fff"
-        router
-      >
-      <!-- 系统管理 -->
+      <el-menu active-text-color="#ffd04b" background-color="#232323" :default-active="$route.path" text-color="#fff"
+        router unique-opened>
+        <!-- 系统入库 -->
         <el-menu-item index="/detail">
           <el-icon>
             <Management />
@@ -67,8 +67,13 @@ const opens =ref(localStorage.getItem("menus") ? JSON.parse(localStorage.getItem
           </el-icon>
           <span>档案管理</span>
         </el-menu-item>
-        <!-- 档案入库 -->
-        
+        <!-- 未交档案 -->
+        <el-menu-item index="/unpaid">
+          <el-icon>
+            <List />
+          </el-icon>
+          <span>未交档案</span>
+        </el-menu-item>
         <!-- 个人中心 -->
         <el-sub-menu index="/user">
           <template #title>
@@ -90,14 +95,28 @@ const opens =ref(localStorage.getItem("menus") ? JSON.parse(localStorage.getItem
             <span>重置密码</span>
           </el-menu-item>
         </el-sub-menu>
+        <el-sub-menu index="/system">
+          <template #title>
+            <el-icon><Grid /></el-icon>
+            <span>系统管理</span>
+          </template>
+          <el-menu-item index="/system/user">
+            <el-icon><Avatar /></el-icon>
+            <span>用户管理</span>
+          </el-menu-item>
+          <el-menu-item index="/system/role">
+            <el-icon><Key /></el-icon>
+            <span>角色管理</span>
+          </el-menu-item>
+        </el-sub-menu>
       </el-menu>
     </el-aside>
     <el-container>
       <el-header>
         <div>
           <strong>{{
-            userStore.user.nickname || userStore.user.username
-          }}</strong>
+        userStore.user.nickname || userStore.user.username
+      }}</strong>
         </div>
         <el-dropdown placement="bottom-end" @command="handleCommand">
           <span class="el-dropdown__box">
@@ -108,15 +127,9 @@ const opens =ref(localStorage.getItem("menus") ? JSON.parse(localStorage.getItem
           </span>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item command="profile" :icon="User"
-                >基本资料</el-dropdown-item
-              >
-              <el-dropdown-item command="password" :icon="EditPen"
-                >重置密码</el-dropdown-item
-              >
-              <el-dropdown-item command="logout" :icon="SwitchButton"
-                >退出登录</el-dropdown-item
-              >
+              <el-dropdown-item command="profile" :icon="User">基本资料</el-dropdown-item>
+              <el-dropdown-item command="password" :icon="EditPen">重置密码</el-dropdown-item>
+              <el-dropdown-item command="logout" :icon="SwitchButton">退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>

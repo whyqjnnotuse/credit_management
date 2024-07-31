@@ -6,6 +6,12 @@ export const GetListService = (params) =>
     params
   })
 
+  // 档案管理：获取档案
+export const GetSearchService = (params) =>
+  request.get('/management', {
+    params
+  })
+
 // 档案管理：编辑或新增档案
 export const EditOrAddService = (data) => 
   request.post('/management', data)

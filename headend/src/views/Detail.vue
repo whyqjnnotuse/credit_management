@@ -1,7 +1,7 @@
 <script setup>
 import { useUserStore } from '@/stores'
 import { useRouter } from 'vue-router'
-import { ref, reactive, onMounted,watch, nextTick } from 'vue'
+import { ref, reactive, onMounted, watch, nextTick } from 'vue'
 import { Edit, Delete } from '@element-plus/icons-vue'
 import { formatTime, formatTime2 } from '@/utils/format.js'
 import { GetListService, DelbatchListService, DelService, EditOrAddService, ExportService } from '@/api/detail'
@@ -20,7 +20,7 @@ const title = ref('')
 const total = ref(0)
 const params = ref({
   pageNum: 1,
-  pageSize: 10,
+  pageSize: 5,
   clientName: '',
   businessVariety: ''
 })
@@ -117,9 +117,9 @@ const editManage = async (row) => {
   console.log(form.value)
   console.log(1111);
 }
-const save =  () => {
+const save = () => {
   console.log('保存')
-  formRef.value.validate( async(valid) => {
+  formRef.value.validate(async (valid) => {
     if (valid) {
       // Submit form
       await EditOrAddService(form.value)
@@ -192,17 +192,21 @@ onMounted(() => {
 // 关闭对话框
 const cancel = () => {
   dialogFormVisible.value = false;
-      formRef.value.resetFields();
+  formRef.value.resetFields();
 }
 
 const closeDialog = () => {
   dialogFormVisible.value = false;
-      formRef.value.resetFields();
+  formRef.value.resetFields();
 }
 // 导入
 const handleExcelImportSuccess = () => {
   ElMessage.success('导入成功')
   getDetailList()
+}
+// 上传文件
+const handleSuccess = () => {
+  ElMessage.success('上传成功')
 }
 </script>
 
@@ -244,24 +248,37 @@ const handleExcelImportSuccess = () => {
       @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55"></el-table-column>
       <!-- <el-table-column prop="id" label="ID" width="80" sortable></el-table-column> -->
-      <el-table-column prop="lendingInstitution" label="放款机构"></el-table-column>
-      <el-table-column prop="clientName" label="客户名称" width="100"></el-table-column>
-      <el-table-column prop="userCode" label="客户代码"></el-table-column>
-      <el-table-column prop="loanContractId" label="借款合同编号"></el-table-column>
-      <el-table-column prop="loanVoucherId" label="借款凭证编号"></el-table-column>
-      <el-table-column prop="businessVariety" label="业务品种"></el-table-column>
-      <el-table-column prop="loanAmount" label="借款金额" sortable></el-table-column>
-      <el-table-column prop="loanDate" label="借款日期" sortable>
+      <el-table-column prop="lendingInstitution" label="放款机构" width="140" fixed></el-table-column>
+      <el-table-column prop="clientName" label="客户名称" width="100" fixed></el-table-column>
+      <el-table-column prop="userCode" label="客户代码" width="150"></el-table-column>
+      <el-table-column prop="loanContractId" label="借款合同编号" width="150"></el-table-column>
+      <el-table-column prop="loanVoucherId" label="借款凭证编号" width="150"></el-table-column>
+      <el-table-column prop="businessVariety" label="业务品种" width="150"></el-table-column>
+      <el-table-column prop="loanAmount" label="借款金额" sortable width="150"></el-table-column>
+      <el-table-column prop="loanDate" label="借款日期" sortable width="150">
         <template #default="{ row }">
           {{ formatTime(row.loanDate) }}
         </template>
       </el-table-column>
-      <el-table-column prop="lastDate" label="到期日期" sortable>
+      <el-table-column prop="lastDate" label="到期日期" sortable width="150">
         <template #default="{ row }">
           {{ formatTime(row.lastDate) }}
         </template>
       </el-table-column>
-      <el-table-column label="操作">
+      <el-table-column prop="file" label="档案材料" width="150">
+        <template #default="{ row }">
+          <el-upload v-model:file-list="fileList" class="upload-demo"
+            action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" multiple 
+            :on-remove="handleRemove" :before-remove="beforeRemove" :limit="3":on-success="handleSuccess" >
+            <el-button type="primary">上传文件</el-button>
+            <template #tip>
+              <div class="el-upload__tip">
+              </div>
+            </template>
+          </el-upload>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="110">
         <template #default="{ row, $index }">
           <el-button type="primary" :icon="Edit" circle plain @click="editManage(row, $index)"></el-button>
           <el-button type="danger" :icon="Delete" circle plain @click="deleteManage(row, $index)"></el-button>
@@ -269,12 +286,14 @@ const handleExcelImportSuccess = () => {
       </el-table-column>
     </el-table>
     <!-- 分页区域 -->
-    <el-pagination v-model:current-page="params.pageNum" v-model:page-size="params.pageSize" :page-sizes="[1, 2, 5, 10]"
+    <el-pagination v-model:current-page="params.pageNum" v-model:page-size="params.pageSize" :page-sizes="[1, 2, 5]"
       background layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange"
       @current-change="handleCurrentChange" style="margin-top: 25px; justify-content: flex-end" />
     <!-- 对话框 -->
-    <el-dialog :title="title" v-model="dialogFormVisible" width="40%" :before-close="closeDialog" :close-on-click-modal="false">
-      <el-form :model="form" :rules="rules" ref="formRef" label-width="120px" size="small" style="width: 80%; margin: 0 auto">
+    <el-dialog :title="title" v-model="dialogFormVisible" width="40%" :before-close="closeDialog"
+      :close-on-click-modal="false">
+      <el-form :model="form" :rules="rules" ref="formRef" label-width="120px" size="small"
+        style="width: 80%; margin: 0 auto">
         <el-form-item prop="lendingInstitution" label="放款机构">
           <el-input v-model="form.lendingInstitution" autocomplete="off"></el-input>
         </el-form-item>

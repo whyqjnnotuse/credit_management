@@ -21,7 +21,7 @@ const title = ref('')
 const total = ref(0)
 const params = ref({
   pageNum: 1,
-  pageSize: 10,
+  pageSize: 5,
   username: '',
   creditRecipients: ''
 })
@@ -60,15 +60,15 @@ const rules = {
 const getManagementList = async () => {
   try {
     loading.value = true
-  //   const newParams = {
-  //   ...params,
-  //   handoverTime: formatTime2(params.handoverTime)  
-  // };
-  // console.log(newParams.value);
-  console.log('params.value')
+    //   const newParams = {
+    //   ...params,
+    //   handoverTime: formatTime2(params.handoverTime)  
+    // };
+    // console.log(newParams.value);
+    // console.log('params.value')
     console.log(params.value)
     const res = await GetListService(params.value)
-    console.log('res.data.data')
+    // console.log('res.data.data')
     console.log(res.data.data)
 
     if (res.data && res.data.data) {
@@ -93,7 +93,7 @@ const onReset = () => {
 }
 
 // 搜索
-const onSearch = () => {
+const onSearch = async () => {
   console.log('搜索');
   params.value.pageNum = 1
   getManagementList()
@@ -119,7 +119,7 @@ const editManage = async (row) => {
 }
 const save = async () => {
   console.log('保存')
-  formRef.value.validate( async(valid) => {
+  formRef.value.validate(async (valid) => {
     if (valid) {
       // Submit form
       await EditOrAddService(form.value)
@@ -172,11 +172,11 @@ const handleSelectionChange = (val) => {
 }
 const cancel = () => {
   dialogFormVisible.value = false;
-      formRef.value.resetFields();
+  formRef.value.resetFields();
 }
 const closeDialog = () => {
   dialogFormVisible.value = false;
-      formRef.value.resetFields();
+  formRef.value.resetFields();
 }
 // 处理分页逻辑
 const handleSizeChange = (pageSize) => {
@@ -277,12 +277,13 @@ onMounted(() => {
       </el-table-column>
     </el-table>
     <!-- 分页区域 -->
-    <el-pagination v-model:current-page="params.pageNum" v-model:page-size="params.pageSize" :page-sizes="[1, 2, 5, 10]"
+    <el-pagination v-model:current-page="params.pageNum" v-model:page-size="params.pageSize" :page-sizes="[1, 2, 5]"
       background layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange"
       @current-change="handleCurrentChange" style="margin-top: 25px; justify-content: flex-end" />
     <!-- 对话框 -->
-    <el-dialog :title="title" v-model="dialogFormVisible" width="40%"  :before-close="closeDialog">
-      <el-form :model="form" :rules="rules" ref="formRef" label-width="120px" size="small" style="width: 80%; margin: 0 auto">
+    <el-dialog :title="title" v-model="dialogFormVisible" width="40%" :before-close="closeDialog">
+      <el-form :model="form" :rules="rules" ref="formRef" label-width="120px" size="small"
+        style="width: 80%; margin: 0 auto">
         <el-form-item prop="userCode" label="客户代码">
           <el-input v-model="form.userCode" autocomplete="off"></el-input>
         </el-form-item>

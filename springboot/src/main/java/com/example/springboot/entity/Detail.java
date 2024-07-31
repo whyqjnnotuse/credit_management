@@ -48,6 +48,8 @@ public class Detail implements Serializable {
     private Long loanVoucherId;
     @ExcelProperty("业务品种")
     private String businessVariety;
+    @ExcelProperty("文件")
+    private String file;
 
 
 }

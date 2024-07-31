@@ -78,9 +78,9 @@ const onReset = () => {
 }
 </script>
 <template>
-  <page-container title="重置密码">
-    <el-row>
-      <el-col :span="12">
+  <el-card>
+    <el-row style="margin:50px 0 0 25px;">
+      <el-col :span="20">
         <el-form
           :model="pwdForm"
           :rules="rules"
@@ -109,12 +109,30 @@ const onReset = () => {
               show-password
             ></el-input>
           </el-form-item>
-          <el-form-item>
+          <el-form-item style="margin-top: 50px;">
             <el-button @click="onSubmit" type="primary">修改密码</el-button>
             <el-button @click="onReset">重置</el-button>
+            <!-- <el-row>
+              <el-col :span="12"><el-button @click="onSubmit" type="primary">修改密码</el-button></el-col>
+              <el-col :span="12"><el-button @click="onReset">重置</el-button></el-col>
+            </el-row> -->
           </el-form-item>
         </el-form>
       </el-col>
     </el-row>
-  </page-container>
+  </el-card>
 </template>
+<style scoped>
+.el-card {
+  width: 550px;
+  border-radius: 10px;
+  min-height: 450px;
+}
+.el-form-item{
+  margin-bottom: 40px;
+}
+
+.el-button+.el-button {
+    margin-left: 137px;
+}
+</style>

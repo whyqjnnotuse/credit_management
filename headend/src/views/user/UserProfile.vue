@@ -43,8 +43,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <el-card style="width: 500px;">
-    <el-form label-width="80px" size="small" :rules="rules">
+  <el-card>
+    <el-form label-width="80px" :rules="rules">
       <!-- shape="circle" -->
       <el-upload ref="uploadRef" class="avatar-uploader" action="http://localhost:9090/file/upload" :auto-upload="false"
         :show-file-list="false" :on-change="handleAvatarSuccess">
@@ -83,6 +83,11 @@ onMounted(() => {
   </el-card>
 </template>
 <style lang="scss" scoped>
+.el-card{
+  border-radius: 10px;
+  min-height: 550px;
+  width: 580px;
+}
 .avatar-uploader {
   text-align: center;
   padding-bottom: 10px;

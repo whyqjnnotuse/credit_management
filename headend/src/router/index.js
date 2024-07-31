@@ -6,11 +6,15 @@ const router = createRouter({
     {
       path: '/',
       component: () => import('@/views/layout/LayoutContainer.vue'),
-      redirect: '/management',
+      redirect: '/unpaid',
       children: [
         {
           path: '/management',
           component: () => import('@/views/Management.vue')
+        },
+        {
+          path: '/unpaid',
+          component: () => import('@/views/Unpaid.vue')
         },
         {
           path: '/detail',
@@ -19,6 +23,10 @@ const router = createRouter({
         {
           path: '/system/user',
           component: () => import('@/views/system/user.vue')
+        },
+        {
+          path: '/system/role',
+          component: () => import('@/views/system/role.vue')
         },
         {
           path: '/user/profile',
