@@ -29,9 +29,9 @@ public class CodeGenerator {
     private static final String basePath = System.getProperty("user.dir");
 
     // 数据库需要生成代码的表名
-    private static final String tableName = "management";
+    private static final String tableName = "combined_table";
     // 生成页面的菜单名称
-    private static final String modelName = "档案库管理";
+    private static final String modelName = "未交档案";
 
     // ----------------------------------------以上必须修改-----------------------------------------
 
