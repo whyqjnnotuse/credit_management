@@ -28,7 +28,7 @@ public class CombinedTable implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String username;
-    @TableId(value = "userCode", type = IdType.AUTO)
+    @TableId(value = "user_code", type = IdType.AUTO)
     private Long userCode;
     private String creditRecipients;
 

@@ -34,14 +34,8 @@ public class CombinedTableServiceImpl extends ServiceImpl<CombinedTableMapper, C
         try {
             // 注册 JDBC 驱动程序
 //            Class.forName("com.mysql.cj.jdbc.Driver");
-
             // 打开连接
             connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
-
-            // 创建表 comb ined_table
-//            String createTableSQL = "CREATE TABLE IF NOT EXISTS combined_table (id INT, name VARCHAR(255))";
-//            statement = connection.createStatement();
-//            statement.executeUpdate(createTableSQL);
 
             // 合并 table1 和 table2 的数据并插入到 combined_table
 //            String insertSQL = "INSERT INTO combined_table (user_code, username, credit_recipients, operation_type, loan_id, archive_location, contract_id, handover_time, Lending_institution, loan_amount, loan_date, last_date, file) " +
@@ -58,7 +52,8 @@ public class CombinedTableServiceImpl extends ServiceImpl<CombinedTableMapper, C
                     "username = VALUES(username), credit_recipients = VALUES(credit_recipients), operation_type = VALUES(operation_type), loan_id = VALUES(loan_id), archive_location = VALUES(archive_location), contract_id = VALUES(contract_id), handover_time = VALUES(handover_time), " +
                     "Lending_institution = COALESCE(VALUES(Lending_institution), Lending_institution), loan_amount = COALESCE(VALUES(loan_amount), loan_amount), loan_date = COALESCE(VALUES(loan_date), loan_date), last_date = COALESCE(VALUES(last_date), last_date), file = COALESCE(VALUES(file), file)";
             statement.executeUpdate(insertManagementSQL);
-// 插入 detail 表的数据
+
+            // 插入 detail 表的数据
             String insertDetailSQL = "INSERT INTO combined_table (user_code, username, credit_recipients, operation_type, loan_id, archive_location, contract_id, handover_time, Lending_institution, loan_amount, loan_date, last_date, file) " +
                     "SELECT user_code,client_name AS username, NULL AS credit_recipients, business_variety AS operation_type, loan_voucher_id AS loan_id, NULL AS archive_location, loan_contract_id AS contract_id,  NULL AS handover_time, Lending_institution, loan_amount, loan_date, last_date, file FROM detail " +
                     "ON DUPLICATE KEY UPDATE " +

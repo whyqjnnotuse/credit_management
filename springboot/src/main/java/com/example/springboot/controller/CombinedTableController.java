@@ -22,7 +22,7 @@ import com.example.springboot.service.ICombinedTableService;
 import com.example.springboot.entity.CombinedTable;
 
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 /**
  * <p>
  *  前端控制器
@@ -51,15 +51,15 @@ public class CombinedTableController {
         return Result.success();
     }
 
-    @DeleteMapping("/{userCode}")
-    public Result delete(@PathVariable Integer userCode) {
-        combinedTableService.removeById(userCode);
+    @DeleteMapping("/{user_code}")
+    public Result delete(@PathVariable Integer user_code) {
+        combinedTableService.removeById(user_code);
         return Result.success();
     }
 
     @PostMapping("/del/batch")
-    public Result deleteBatch(@RequestBody List<Integer> userCodes) {
-        combinedTableService.removeByIds(userCodes);
+    public Result deleteBatch(@RequestBody List<Integer> user_code) {
+        combinedTableService.removeByIds(user_code);
         return Result.success();
     }
 
@@ -68,9 +68,9 @@ public class CombinedTableController {
         return Result.success(combinedTableService.list());
     }
 
-    @GetMapping("/{userCode}")
-    public Result findOne(@PathVariable Integer userCode) {
-        return Result.success(combinedTableService.getById(userCode));
+    @GetMapping("/{user_code}")
+    public Result findOne(@PathVariable Integer user_code) {
+        return Result.success(combinedTableService.getById(user_code));
     }
 
     @GetMapping("/page")
@@ -78,7 +78,7 @@ public class CombinedTableController {
                            @RequestParam Integer pageNum,
                            @RequestParam Integer pageSize) {
         QueryWrapper<CombinedTable> queryWrapper = new QueryWrapper<>();
-        queryWrapper.orderByDesc("userCode");
+//        queryWrapper.orderByDesc("user_code");
         if (!"".equals(name)) {
             queryWrapper.like("name", name);
         }
@@ -134,5 +134,13 @@ public class CombinedTableController {
         return TokenUtils.getCurrentUser();
     }
 
+    /**
+     * 合并表数据的接口
+     */
+    @PostMapping("/merge")
+    public Result mergeTables() {
+            combinedTableService.combineTables();
+            return Result.success();
+    }
 }
 

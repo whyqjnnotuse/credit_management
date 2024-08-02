@@ -11,5 +11,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author 
  */
 public interface ICombinedTableService extends IService<CombinedTable> {
-
+    // 定义必要的服务方法
+    void combineTables();
 }
