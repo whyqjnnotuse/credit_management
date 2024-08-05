@@ -1,10 +1,8 @@
 <script setup>
-import { useRouter } from 'vue-router'
-import { ref, reactive, onMounted, watch, nextTick } from 'vue'
+import { ref, onMounted, } from 'vue'
 import { Edit, Delete } from '@element-plus/icons-vue'
 import { getRoleListService, RoleEditOrAddService, RoleDelService, RoleDelbatchService } from '@/api/system'
 
-const router = useRouter()
 const tableData = ref([])
 const loading = ref(false)
 const form = ref({})
@@ -12,6 +10,7 @@ const formRef = ref(null);
 const dialogFormVisible = ref(false)
 const multipleSelection = ref([])
 const title = ref('')
+
 
 // 总条数
 const total = ref(0)
@@ -29,7 +28,7 @@ const getRoleList = async () => {
       tableData.value = res.data.data.records
       total.value = res.data.data.total
     } else {
-      console.error('数据格式不正确', res2.data);
+      console.error('数据格式不正确');
     }
     loading.value = false
   } catch (error) {

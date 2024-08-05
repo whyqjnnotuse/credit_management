@@ -19,6 +19,7 @@ import { useUserStore } from '@/stores'
 import { useRouter } from 'vue-router'
 import { ref } from 'vue'
 const user = ref(localStorage.getItem("credit_user") ? JSON.parse(localStorage.getItem("credit_user")) : {})
+
 const avatarUrl = ref(user.value.data.avatarUrl)
 const userStore = useUserStore()
 const router = useRouter()
@@ -95,7 +96,7 @@ const opens = ref(localStorage.getItem("menus") ? JSON.parse(localStorage.getIte
             <span>重置密码</span>
           </el-menu-item>
         </el-sub-menu>
-        <el-sub-menu index="/system">
+        <el-sub-menu index="/system" v-if="user.data.role === 'role_admin'">
           <template #title>
             <el-icon><Grid /></el-icon>
             <span>系统管理</span>

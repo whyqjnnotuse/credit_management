@@ -16,15 +16,36 @@ const getUser = async () => {
   form.value = res.data.data
   // console.log(form.value);
 }
+// 上传图片
+const beforeUpload = (file) => {
+  const isJPG = file.type === 'image/jpeg'
+  const isPNG = file.type === 'image/png'
+  const isLt2M = file.size / 1024 / 1024 < 2
 
-const handleAvatarSuccess = (file) => {
-  const reader = new FileReader()
-  reader.readAsDataURL(file.raw)
-  reader.onload = () => {
-    form.value.avatarUrl = reader.result
-    console.log(reader);
+  if (!isJPG && !isPNG) {
+    ElMessage.error('上传头像图片只能是 JPG 或 PNG 格式!')
+    return false
   }
+  if (!isLt2M) {
+    ElMessage.error('上传头像图片大小不能超过 2MB!')
+    return false
+  }
+  return true
 }
+
+const handleAvatarSuccess = (response) => {
+  form.value.avatarUrl = response
+  ElMessage.success('图片上传成功!')
+}
+
+// const handleAvatarSuccess = (file) => {
+//   const reader = new FileReader()
+//   reader.readAsDataURL(file.raw)
+//   reader.onload = () => {
+//     form.value.avatarUrl = reader.result
+//     console.log(reader);
+//   }
+// }
 // const handleAvatarSuccess = (res) => {
 //   console.log(res.name);
 //   form.value.avatarUrl = res.name
@@ -32,7 +53,12 @@ const handleAvatarSuccess = (file) => {
 // }
 const save = async () => {
   // localStorage.setItem("user", JSON.stringify(form.value))
-  await userUpdateInfoService(form.value)
+  const res = await userUpdateInfoService(form.value)
+  console.log(res.config.data);
+  user.value.data = form.value
+  console.log(user.value.data);
+  localStorage.setItem("credit_user", JSON.stringify(user.value))
+  // localStorage.setItem("credit_user", JSON.stringify(form.value))
   ElMessage({ type: 'success', message: '更换信息成功' })
   getUser()
 }
@@ -46,8 +72,9 @@ onMounted(() => {
   <el-card>
     <el-form label-width="80px" :rules="rules">
       <!-- shape="circle" -->
-      <el-upload ref="uploadRef" class="avatar-uploader" action="http://localhost:9090/file/upload" :auto-upload="false"
-        :show-file-list="false" :on-change="handleAvatarSuccess">
+      <el-upload ref="uploadRef" class="avatar-uploader" action="http://localhost:9090/file/upload" :before-upload="beforeUpload"
+      :on-success="handleAvatarSuccess"
+      :show-file-list="false">
         <img v-if="form.avatarUrl" :src="form.avatarUrl" class="avatar" />
         <img v-else src="https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png" width="278" />
       </el-upload>

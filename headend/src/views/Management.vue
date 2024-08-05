@@ -10,7 +10,8 @@ const form = ref({})
 const formRef = ref(null);
 const dialogFormVisible = ref(false)
 const multipleSelection = ref([])
-const user = reactive(localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : {})
+const user = reactive(localStorage.getItem("credit_user") ? JSON.parse(localStorage.getItem("credit_user")) : {})
+
 
 const title = ref('')
 // 总条数
@@ -256,7 +257,7 @@ onMounted(() => {
           <el-button type="primary" class="ml-5">导入 <i class="el-icon-bottom"></i></el-button>
         </el-upload> -->
       </el-form-item>
-      <el-form-item>
+      <el-form-item v-if="user.data.role === 'role_admin' || user.data.role === 'role_archives'">
         <el-button type="primary" @click="exp" class="ml-5">导出 <i class="el-icon-top"></i></el-button>
       </el-form-item>
     </el-form>

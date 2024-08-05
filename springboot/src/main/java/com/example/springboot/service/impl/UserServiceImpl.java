@@ -75,7 +75,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             one = new User();
             BeanUtil.copyProperties(userDTO, one, true);
             // 默认一个普通用户的角色
-            one.setRole(RoleEnum.ROLE_USER.toString());
+            one.setRole(RoleEnum.role_synthesis.toString());
             save(one);  // 把 copy完之后的用户对象存储到数据库
         } else {
             throw new ServiceException(Constants.CODE_600, "用户已存在");

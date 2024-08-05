@@ -85,8 +85,15 @@ public class UserController {
                 user.setPassword("123");
             }
         }
-        return Result.success(userService.saveOrUpdate(user));
-    }
+        boolean isSuccess = userService.saveOrUpdate(user);
+        if (isSuccess) {
+            // 确保返回保存或更新后的用户对象
+            User updatedUser = userService.getById(user.getId());
+            return Result.success(updatedUser);
+        } else {
+            return Result.error(Constants.CODE_500, "保存失败");
+        }
+        }
     /**
      * 修改密码
      *
