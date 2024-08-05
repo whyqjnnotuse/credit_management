@@ -164,19 +164,19 @@ public class UserController {
     public Result findPage(@RequestParam Integer pageNum,
                            @RequestParam Integer pageSize,
                            @RequestParam(defaultValue = "") String username,
-                           @RequestParam(defaultValue = "") String email,
-                           @RequestParam(defaultValue = "") String address) {
+                           @RequestParam(defaultValue = "") String nickname,
+                           @RequestParam(defaultValue = "") String role) {
 
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.orderByDesc("id");
         if (!"".equals(username)) {
             queryWrapper.like("username", username);
         }
-        if (!"".equals(email)) {
-            queryWrapper.like("email", email);
+        if (!"".equals(nickname)) {
+            queryWrapper.like("nickname", nickname);
         }
-        if (!"".equals(address)) {
-            queryWrapper.like("address", address);
+        if (!"".equals(role)) {
+            queryWrapper.like("role", role);
         }
 
         return Result.success(userService.page(new Page<>(pageNum, pageSize), queryWrapper));

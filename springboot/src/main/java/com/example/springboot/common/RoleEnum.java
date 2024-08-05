@@ -1,5 +1,5 @@
 package com.example.springboot.common;
 
 public enum RoleEnum {
-    ROLE_ADMIN, ROLE_USER;
+    role_admin, role_archives, role_synthesis
 }

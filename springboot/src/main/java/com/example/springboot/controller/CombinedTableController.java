@@ -74,13 +74,13 @@ public class CombinedTableController {
     }
 
     @GetMapping("/page")
-    public Result findPage(@RequestParam(defaultValue = "") String name,
+    public Result findPage(@RequestParam(required = false) Long userCode,
                            @RequestParam Integer pageNum,
                            @RequestParam Integer pageSize) {
         QueryWrapper<CombinedTable> queryWrapper = new QueryWrapper<>();
 //        queryWrapper.orderByDesc("user_code");
-        if (!"".equals(name)) {
-            queryWrapper.like("name", name);
+        if (userCode != null) {
+            queryWrapper.eq("user_code", userCode); // 使用精确匹配
         }
 //        User currentUser = TokenUtils.getCurrentUser();
 //        if (currentUser.getRole().equals("ROLE_USER")) {

@@ -79,18 +79,35 @@ public class DetailController {
     }
 
     @GetMapping("/page")
-    public Result findPage(@RequestParam(defaultValue = "") String name,
+    public Result findPage(@RequestParam(required = false) String clientName,
+                           @RequestParam(required = false) String lendingInstitution,
+                           @RequestParam(required = false) Long userCode,
+                           @RequestParam(required = false) Long loanContractId,
+                           @RequestParam(required = false) Long loanVoucherId,
+                           @RequestParam(required = false) String businessVariety,
                            @RequestParam Integer pageNum,
                            @RequestParam Integer pageSize) {
         QueryWrapper<Detail> queryWrapper = new QueryWrapper<>();
         queryWrapper.orderByDesc("id");
-        if (!"".equals(name)) {
-            queryWrapper.like("name", name);
+        if (clientName != null && !clientName.isEmpty()) {
+            queryWrapper.like("client_name", clientName); // 使用模糊匹配
         }
-//        User currentUser = TokenUtils.getCurrentUser();
-//        if (currentUser.getRole().equals("ROLE_USER")) {
-//            queryWrapper.eq("user", currentUser.getUsername());
-//        }
+        if (lendingInstitution != null && !lendingInstitution.isEmpty()) {
+            queryWrapper.like("lending_institution", lendingInstitution); // 使用模糊匹配
+        }
+        if (businessVariety != null && !businessVariety.isEmpty()) {
+            queryWrapper.like("business_variety", businessVariety); // 使用模糊匹配
+        }
+        if (userCode != null) {
+            queryWrapper.eq("user_code", userCode); // 使用精确匹配
+        }
+        if (loanContractId != null) {
+            queryWrapper.eq("loan_contract_id", loanContractId); // 使用精确匹配
+        }
+        if (loanVoucherId != null) {
+            queryWrapper.eq("loan_voucher_id", loanVoucherId); // 使用精确匹配
+        }
+
         return Result.success(detailService.page(new Page<>(pageNum, pageSize), queryWrapper));
     }
 

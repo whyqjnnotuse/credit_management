@@ -1,6 +1,4 @@
 <script setup>
-import { useUserStore } from '@/stores'
-import { useRouter } from 'vue-router'
 import { ref, reactive, onMounted, watch, nextTick } from 'vue'
 import { Edit, Delete } from '@element-plus/icons-vue'
 import { formatTime, formatTime2 } from '@/utils/format.js'
@@ -12,9 +10,6 @@ const form = ref({})
 const formRef = ref(null);
 const dialogFormVisible = ref(false)
 const multipleSelection = ref([])
-const user = reactive(localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : {})
-const router = useRouter()
-const store = useUserStore()
 const title = ref('')
 // 总条数
 const total = ref(0)
@@ -22,7 +17,11 @@ const params = ref({
   pageNum: 1,
   pageSize: 5,
   clientName: '',
-  businessVariety: ''
+  userCode:null,
+  loanContractId:null,
+  loanVoucherId:null,
+  businessVariety: '',
+  lendingInstitution:''
 })
 // 表单验证规则
 const rules = {
@@ -87,6 +86,10 @@ const getDetailList = async () => {
 const onReset = () => {
   params.value.pageNum = 1
   params.value.clientName = ''
+  params.value.userCode = ''
+  params.value.loanContractId = ''
+  params.value.loanVoucherId = ''
+  params.value.lendingInstitution = ''
   params.value.businessVariety = ''
   getDetailList()
 }
@@ -216,11 +219,24 @@ const handleSuccess = () => {
       <el-form-item label="客户名称">
         <el-input v-model="params.clientName" placeholder="请输入客户名称"></el-input>
       </el-form-item>
+      <el-form-item label="客户代码">
+        <el-input v-model.number="params.userCode" placeholder="请输入客户代码"></el-input>
+      </el-form-item>
+      <el-form-item label="借款合同编号">
+        <el-input v-model.number="params.loanContractId" placeholder="请输入借款合同编号"></el-input>
+      </el-form-item>
+      <el-form-item label="借款凭证编号">
+        <el-input v-model.number="params.loanVoucherId" placeholder="请输入借款凭证编号"></el-input>
+      </el-form-item>
+      <el-form-item label="放款机构">
+        <el-input v-model="params.lendingInstitution" placeholder="请输入放款机构名称"></el-input>
+      </el-form-item>
       <el-form-item label="业务品种">
-        <el-select v-model="params.businessVariety" style="width:105px">
+        <!-- <el-select v-model="params.businessVariety" style="width:105px">
           <el-option label="二手房贷款1" value="二手房贷款1"></el-option>
           <el-option label="二手房贷款2" value="二手房贷款2"></el-option>
-        </el-select>
+        </el-select> -->
+        <el-input v-model="params.businessVariety" placeholder="请输入业务品种"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="onSearch" type="primary">搜索</el-button>

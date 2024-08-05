@@ -162,7 +162,7 @@ onMounted(() => {
     <el-table :data="tableData" border stripe :header-cell-class-name="'headerBg'" v-loading="loading"
       @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55"></el-table-column>
-      <el-table-column prop="id" label="ID" width="80"></el-table-column>
+      <!-- <el-table-column prop="id" label="ID" width="80"></el-table-column> -->
       <el-table-column prop="name" label="名称"></el-table-column>
       <el-table-column prop="flag" label="唯一标识"></el-table-column>
       <el-table-column prop="description" label="描述"></el-table-column>

@@ -20,7 +20,7 @@ const total = ref(0)
 const params = ref({
   pageNum: 1,
   pageSize: 5,
-  name: ''
+  userCode: null
 })
 
 // 获取列表
@@ -50,7 +50,7 @@ const getUnpaidList = async () => {
 // 重置
 const onReset = () => {
   params.value.pageNum = 1
-  params.value.username = ''
+  params.value.userCode = null
   getUnpaidList()
 }
 
@@ -158,8 +158,8 @@ onMounted(()=>{
     <el-card shadow="always" class="card">
       <!-- 表单 -->
       <el-form inline>
-        <el-form-item label="用户">
-        <el-input v-model="params.username" placeholder="请输入用户"></el-input>
+        <el-form-item label="客户代码">
+        <el-input v-model.number="params.userCode" placeholder="请输入客户代码"></el-input>
       </el-form-item>
         <el-form-item>
         <el-button @click="onSearch" type="primary">搜索</el-button>
@@ -177,7 +177,8 @@ onMounted(()=>{
     <el-table :data="tableData" border stripe :header-cell-class-name="'headerBg'"
       @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55"></el-table-column>
-      <el-table-column prop="username" label="客户姓名" fixed></el-table-column>
+      <el-table-column  label="档案管理">
+      <el-table-column prop="username" label="客户姓名" fixed></el-table-column> 
       <el-table-column prop="userCode" label="客户代码" fixed></el-table-column>
       <el-table-column prop="creditRecipients" label="信贷对象"></el-table-column>
       <el-table-column prop="operationType" label="业务品种"></el-table-column>
@@ -189,6 +190,8 @@ onMounted(()=>{
           {{ formatTime(row.handoverTime) }}
         </template>
       </el-table-column>
+    </el-table-column> 
+    <el-table-column  label="档案入库">
       <el-table-column prop="lendingInstitution" label="放贷机构"></el-table-column>
       <el-table-column prop="loanAmount" label="借款金额"></el-table-column>
       <el-table-column prop="loanDate" label="借款日期">
@@ -214,6 +217,7 @@ onMounted(()=>{
           </el-upload>
         </template>
       </el-table-column>
+    </el-table-column>
       <el-table-column label="操作" width="110">
         <template #default="{ row, $index }">
           <el-button type="primary" :icon="Edit" circle plain @click="editManage(row, $index)"></el-button>

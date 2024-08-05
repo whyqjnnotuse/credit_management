@@ -11,7 +11,7 @@ const form = ref({})
 const formRef = ref(null);
 const dialogFormVisible = ref(false)
 const multipleSelection = ref([])
-const user = reactive(localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : {})
+
 const roles = ref([])
 
 // 总条数
@@ -20,7 +20,8 @@ const params = ref({
   pageNum: 1,
   pageSize: 5,
   username: '',
-  email: ''
+  nickname:'',
+  role:''
 })
 
 // 获取列表
@@ -114,7 +115,8 @@ const deleteUser = async (row) => {
 const onReset = () => {
   params.value.pageNum = 1
   params.value.username = ''
-  params.value.email = ''
+  params.value.nickname = ''
+  params.value.role = ''
   getUserList()
 }
 
@@ -156,8 +158,11 @@ onMounted(() => {
       <el-form-item label="用户名">
         <el-input v-model="params.username" placeholder="请输入用户名"></el-input>
       </el-form-item>
-      <el-form-item label="邮箱">
-        <el-input v-model="params.email" placeholder="请输入邮箱"></el-input>
+      <el-form-item label="昵称">
+        <el-input v-model="params.nickname" placeholder="请输入昵称"></el-input>
+      </el-form-item>
+      <el-form-item label="角色">
+        <el-input v-model="params.role" placeholder="请输入角色"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="onSearch" type="primary">搜索</el-button>

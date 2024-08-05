@@ -79,13 +79,29 @@ public class ManagementController {
     }
 
     @GetMapping("/page")
-    public Result findPage(@RequestParam(defaultValue = "") String name,
+    public Result findPage(@RequestParam(required = false) Long userCode,
+                           @RequestParam(required = false) String username,
+                           @RequestParam(required = false) Long contractId,
+                           @RequestParam(required = false) Long loanId,
+                           @RequestParam(required = false) String creditRecipients,
                            @RequestParam Integer pageNum,
                            @RequestParam Integer pageSize) {
         QueryWrapper<Management> queryWrapper = new QueryWrapper<>();
         queryWrapper.orderByDesc("id");
-        if (!"".equals(name)) {
-            queryWrapper.like("name", name);
+        if (userCode != null) {
+            queryWrapper.eq("user_code", userCode); // 使用精确匹配
+        }
+        if (username != null && !username.isEmpty()) {
+            queryWrapper.like("username", username); // 使用模糊匹配
+        }
+        if (contractId != null) {
+            queryWrapper.eq("contract_id", contractId); // 使用精确匹配
+        }
+        if (loanId != null) {
+            queryWrapper.eq("loan_id", loanId); // 使用精确匹配
+        }
+        if (creditRecipients != null && !creditRecipients.isEmpty()) {
+            queryWrapper.like("credit_recipients", creditRecipients); // 使用模糊匹配
         }
 //        User currentUser = TokenUtils.getCurrentUser();
 //        if (currentUser.getRole().equals("ROLE_USER")) {

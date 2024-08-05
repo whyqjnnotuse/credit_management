@@ -1,7 +1,4 @@
 <script setup>
-import { useUserStore } from '@/stores'
-import { useRouter } from 'vue-router'
-// import moment from 'moment';
 import { ref, reactive, onMounted, watch, nextTick } from 'vue'
 import { Edit, Delete } from '@element-plus/icons-vue'
 import { formatTime, formatTime2 } from '@/utils/format.js'
@@ -14,15 +11,17 @@ const formRef = ref(null);
 const dialogFormVisible = ref(false)
 const multipleSelection = ref([])
 const user = reactive(localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : {})
-const router = useRouter()
-const store = useUserStore()
+
 const title = ref('')
 // 总条数
 const total = ref(0)
 const params = ref({
   pageNum: 1,
   pageSize: 5,
+  userCode: null,
   username: '',
+  contractId: null,
+  loanId: null,
   creditRecipients: ''
 })
 // 表单验证规则
@@ -87,7 +86,10 @@ const getManagementList = async () => {
 // 重置
 const onReset = () => {
   params.value.pageNum = 1
+  params.value.userCode = ''
   params.value.username = ''
+  params.value.contractId = ''
+  params.value.loanId = ''
   params.value.creditRecipients = ''
   getManagementList()
 }
@@ -96,6 +98,7 @@ const onReset = () => {
 const onSearch = async () => {
   console.log('搜索');
   params.value.pageNum = 1
+  // params.value.creditRecipients = parseInt(creditRecipients.value, 20) || ''
   getManagementList()
 }
 
@@ -215,15 +218,27 @@ onMounted(() => {
   <el-card shadow="always" class="card">
     <!-- 表单区域 -->
     <el-form inline>
+      <el-form-item label="客户代码">
+        <el-input v-model.number="params.userCode" placeholder="请输入客户代码"></el-input>
+      </el-form-item>
       <el-form-item label="客户名称">
         <el-input v-model="params.username" placeholder="请输入客户名称"></el-input>
       </el-form-item>
-      <el-form-item label="信贷对象">
+      <el-form-item label="借款合同">
+        <el-input v-model.number="params.contractId" placeholder="请输入借款合同编号"></el-input>
+      </el-form-item>
+      <el-form-item label="借款凭证">
+        <el-input v-model.number="params.loanId" placeholder="请输入借款凭证编号"></el-input>
+      </el-form-item>
+      <el-form-item label="档案位置">
+        <el-input v-model.number="params.archiveLocation" placeholder="请输入档案位置"></el-input>
+      </el-form-item>
+      <!-- <el-form-item label="信贷对象">
         <el-select v-model="params.creditRecipients" style="width:105px">
           <el-option label="个人" value="个人"></el-option>
           <el-option label="法人" value="法人"></el-option>
         </el-select>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item>
         <el-button @click="onSearch" type="primary">搜索</el-button>
         <el-button @click="onReset">重置</el-button>
