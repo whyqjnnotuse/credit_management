@@ -2,8 +2,8 @@
 import { ref, reactive, onMounted, watch, nextTick } from 'vue'
 import { Edit, Delete } from '@element-plus/icons-vue'
 import { formatTime, formatTime2 } from '@/utils/format.js'
-import { GetListService, DelbatchListService, DelService, EditOrAddService, ExportService } from '@/api/detail'
- 
+import { GetListService, DelbatchListService, DelService, EditOrAddService, ExportService, ImportService } from '@/api/detail'
+
 const tableData = ref([])
 const loading = ref(false)
 const form = ref({})
@@ -11,18 +11,20 @@ const formRef = ref(null);
 const dialogFormVisible = ref(false)
 const multipleSelection = ref([])
 const user = ref(localStorage.getItem("credit_user") ? JSON.parse(localStorage.getItem("credit_user")) : {})
+const credit = ref(localStorage.getItem("credit") ? JSON.parse(localStorage.getItem("credit")) : {})
 const title = ref('')
+const uploadRef = ref(null)
 // 总条数
 const total = ref(0)
 const params = ref({
   pageNum: 1,
   pageSize: 5,
   clientName: '',
-  userCode:null,
-  loanContractId:null,
-  loanVoucherId:null,
+  userCode: null,
+  loanContractId: null,
+  loanVoucherId: null,
   businessVariety: '',
-  lendingInstitution:''
+  lendingInstitution: ''
 })
 // 表单验证规则
 const rules = {
@@ -149,7 +151,7 @@ const delBatch = async () => {
     confirmButtonText: '确认',
     cancelButtonText: '取消'
   })
-  let ids = multipleSelection.value?.map(v => v.id)  // [{}, {}, {}] => [1,2,3]
+  let ids = multipleSelection.value?.map(v => v.userCode)  // [{}, {}, {}] => [1,2,3]
   await DelbatchListService(ids)
   ElMessage({ type: 'success', message: '批量删除成功' })
   getDetailList()
@@ -160,7 +162,7 @@ const deleteManage = async (row) => {
     confirmButtonText: '确认',
     cancelButtonText: '取消'
   })
-  await DelService(row.id)
+  await DelService(row.userCode)
   ElMessage({ type: 'success', message: '删除成功' })
   getDetailList()
   console.log('删除')
@@ -204,12 +206,38 @@ const closeDialog = () => {
   formRef.value.resetFields();
 }
 // 导入
-const handleExcelImportSuccess = () => {
+const handleExcelImportSuccess = async () => {
+  // await ImportService()
+  console.log('开始导入');
   ElMessage.success('导入成功')
   getDetailList()
+
 }
+
+// const beforeUpload =async (file) => {
+//   console.log(credit.value.token);
+//   console.log(uploadRef.value);
+//   if (credit.value.token) {
+//     uploadRef.value.headers = {
+//       Authorization: `Bearer ${token}`
+//     };
+//     console.log('token添加成功');
+//   } else {
+//     ElMessage.error('Token 不存在，请重新登录');
+//     return false; // 阻止上传
+//   }
+//   console.log('允许上传');
+//   await ImportService(file)
+//   return true; // 允许上传
+// };
+const error =() => {
+  ElMessage.error('上传失败')
+
+}
+
 // 上传文件
-const handleSuccess = () => {
+const handleSuccess = async () => {
+  await ImportService()
   ElMessage.success('上传成功')
 }
 </script>
@@ -251,8 +279,9 @@ const handleSuccess = () => {
             class="el-icon-remove-outline"></i></el-button>
       </el-form-item>
       <el-form-item>
-        <el-upload action="http://localhost:9090/detail/import" :show-file-list="false" accept="xlsx"
-          :on-success="handleExcelImportSuccess" style="display: inline-block">
+        <!-- :before-upload="beforeUpload" :on-error="error" action="http://localhost:9090/detail/import"-->
+        <el-upload action="http://localhost:9090/detail/import" ref="uploadRef" :show-file-list="false" accept="xlsx"
+          :on-success="handleExcelImportSuccess" :before-upload="beforeUpload" style="display: inline-block">
           <el-button type="primary" class="ml-5">导入 <i class="el-icon-bottom"></i></el-button>
         </el-upload>
       </el-form-item>
@@ -285,8 +314,8 @@ const handleSuccess = () => {
       <el-table-column prop="file" label="档案材料" width="150">
         <template #default="{ row }">
           <el-upload v-model:file-list="fileList" class="upload-demo"
-            action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" multiple 
-            :on-remove="handleRemove" :before-remove="beforeRemove" :limit="3":on-success="handleSuccess" >
+            action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" multiple :on-remove="handleRemove"
+            :before-remove="beforeRemove" :limit="3" :on-success="handleSuccess">
             <el-button type="primary">上传文件</el-button>
             <template #tip>
               <div class="el-upload__tip">

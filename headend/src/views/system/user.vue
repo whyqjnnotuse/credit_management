@@ -147,6 +147,10 @@ const handleCurrentChange = (pageNum) => {
   params.value.pageNum = pageNum
   getUserList()
 }
+// const handleExcelImportSuccess =() => {
+//   ElMessage.success('导入成功')
+//   getUserList()
+// }
 onMounted(() => {
   getUserList()
 })
@@ -172,6 +176,12 @@ onMounted(() => {
         <el-button type="danger" slot="reference" @click="delBatch">批量删除 <i
             class="el-icon-remove-outline"></i></el-button>
       </el-form-item>
+      <!-- <el-form-item>
+        <el-upload action="http://localhost:9090/user/import" ref="uploadRef" :show-file-list="false" accept="xlsx"
+          :on-success="handleExcelImportSuccess" style="display: inline-block">
+          <el-button type="primary" class="ml-5">导入 <i class="el-icon-bottom"></i></el-button>
+        </el-upload>
+      </el-form-item> -->
     </el-form>
     <!-- 表格区域 -->
     <el-table :data="tableData" border stripe :header-cell-class-name="'headerBg'" v-loading="loading"

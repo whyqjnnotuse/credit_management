@@ -27,4 +27,4 @@ request.get('/detail/export', { params })
 
 // 档案入库：导入
 export const ImportService = (params) => 
-  request.get('/detail/import', { params })
+  request.post('/detail/import', { params })

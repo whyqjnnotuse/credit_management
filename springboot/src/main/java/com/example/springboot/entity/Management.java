@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -44,7 +46,7 @@ public class Management implements Serializable {
 
     private Long contractId;
 
-    private LocalDate handoverTime;
+    private Date handoverTime;
 
 
 }

@@ -150,23 +150,6 @@ public class UserController {
         queryWrapper.eq("username", username);
         return Result.success(userService.getOne(queryWrapper));
     }
-    /**
-     * 修改基本资料
-     */
-//    @PutMapping("/profile")
-//    public Result updateProfile(@RequestBody UserProfileDto userProfileDto) {
-//        // 假设UserProfileDto包含username, nickname, email字段
-//        User user = userService.findByUsername(userProfileDto.getUsername());
-//        if (user == null) {
-//            return Result.failure("用户不存在");
-//        }
-//
-//        user.setNickname(userProfileDto.getNickname());
-//        user.setEmail(userProfileDto.getEmail());
-//        userService.updateById(user);
-//
-//        return Result.success(user);
-//    }
     @GetMapping("/page")
     public Result findPage(@RequestParam Integer pageNum,
                            @RequestParam Integer pageSize,
@@ -243,13 +226,13 @@ public class UserController {
         List<User> users = CollUtil.newArrayList();
         for (List<Object> row : list) {
             User user = new User();
-            user.setUsername(row.get(0).toString());
-            user.setPassword(row.get(1).toString());
-            user.setNickname(row.get(2).toString());
-            user.setEmail(row.get(3).toString());
-            user.setPhone(row.get(4).toString());
-            user.setAddress(row.get(5).toString());
-            user.setAvatarUrl(row.get(6).toString());
+            user.setUsername(row.get(1).toString());
+            user.setPassword(row.get(2).toString());
+            user.setNickname(row.get(3).toString());
+            user.setEmail(row.get(4).toString());
+            user.setPhone(row.get(5).toString());
+            user.setAddress(row.get(6).toString());
+            user.setAvatarUrl(row.get(7).toString());
             users.add(user);
         }
 
