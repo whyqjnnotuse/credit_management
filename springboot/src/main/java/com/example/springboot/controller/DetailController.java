@@ -65,14 +65,14 @@ public class DetailController {
     }
 
     @DeleteMapping("/{user_code}")
-    public Result delete(@PathVariable Integer userCode) {
-        detailService.removeById(userCode);
+    public Result delete(@PathVariable Integer user_code) {
+        detailService.removeById(user_code);
         return Result.success();
     }
 
     @PostMapping("/del/batch")
-    public Result deleteBatch(@RequestBody List<Integer> userCode) {
-        detailService.removeByIds(userCode);
+    public Result deleteBatch(@RequestBody List<Integer> user_code) {
+        detailService.removeByIds(user_code);
         return Result.success();
     }
 

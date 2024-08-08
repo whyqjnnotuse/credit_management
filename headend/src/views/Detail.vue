@@ -34,7 +34,7 @@ const rules = {
   ],
   clientName: [
     { required: true, message: '请输入客户名称', trigger: 'blur' },
-    { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
+    { min: 2, max: 10, message: '长度在 2 到 10 个字符', trigger: 'blur' }
   ],
   userCode: [
     { required: true, message: '请输入客户代码', trigger: 'blur' },
@@ -65,7 +65,7 @@ const rules = {
 
 // 获取列表
 const getDetailList = async () => {
-  try {
+  //try {
     loading.value = true
     const res = await GetListService(params.value)
     if (res.data && res.data.data) {
@@ -111,11 +111,11 @@ const getDetailList = async () => {
       console.error('数据格式不正确', res.data);
     }
     loading.value = false
-  } catch (error) {
-    console.error('获取数据失败', error);
-  } finally {
-    loading.value = false
-  }
+  //} catch (error) {
+  //  console.error('获取数据失败', error);
+  //} finally {
+  //  loading.value = false
+  //}
 }
 // 重置
 const onReset = () => {
@@ -240,11 +240,9 @@ const closeDialog = () => {
 }
 // 导入
 const handleExcelImportSuccess = async () => {
-  // await ImportService()
   console.log('开始导入');
   ElMessage.success('导入成功')
   getDetailList()
-
 }
 // 上传文件
 const beforeRemove = () => {
@@ -389,19 +387,19 @@ const handleSuccess = (res, file, fileList, index) => {
           <el-input v-model="form.clientName" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item prop="userCode" label="客户代码">
-          <el-input v-model="form.userCode" autocomplete="off"></el-input>
+          <el-input v-model.number="form.userCode" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item prop="loanContractId" label="借款合同编号">
-          <el-input v-model="form.loanContractId" autocomplete="off"></el-input>
+          <el-input v-model.number="form.loanContractId" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item prop="loanVoucherId" label="借款凭证编号">
-          <el-input v-model="form.loanVoucherId" autocomplete="off"></el-input>
+          <el-input v-model.number="form.loanVoucherId" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item prop="businessVariety" label="业务品种">
           <el-input v-model="form.businessVariety" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item prop="loanAmount" label="借款金额">
-          <el-input v-model="form.loanAmount" autocomplete="off"></el-input>
+          <el-input v-model.number="form.loanAmount" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item prop="loanDate" label="借款日期">
           <el-date-picker v-model="form.loanDate" type="date" placeholder="选择日期"></el-date-picker>
