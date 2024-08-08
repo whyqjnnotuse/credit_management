@@ -5,6 +5,7 @@ import { formatTime, formatTime2 } from '@/utils/format.js'
 import { GetListService, DelbatchListService, DelService, EditOrAddService, ExportService, ImportService } from '@/api/detail'
 
 const tableData = ref([])
+const upload = ref(null)
 const loading = ref(false)
 const form = ref({})
 const formRef = ref(null);
@@ -66,14 +67,45 @@ const rules = {
 const getDetailList = async () => {
   try {
     loading.value = true
-    console.log('params.value')
-    console.log(params.value)
     const res = await GetListService(params.value)
-    console.log('res.data.data')
-    console.log(res.data.data)
-
     if (res.data && res.data.data) {
-      tableData.value = res.data.data.records
+      const records = res.data.data.records
+      records.forEach(item => {
+        item.fileList = [];
+        if (item.file) {
+          const fileArr = JSON.parse(item.file);
+          fileArr.forEach(fileItem => {
+            item.fileList.push({
+              name: fileItem.name,
+              url: fileItem.url
+            })
+          })
+        }
+      })
+
+      // tableData.fileList 不存在
+      // records.forEach(item => {
+      //   item.fileList = [];
+      //   const files = item.file;
+      //   const filesArr = [];
+      //   if (files && files.indexOf(',') != -1) {
+      //     filesArr = files.split(',');
+      //   } else {
+      //     filesArr.push(files);
+      //   }
+
+      //   filesArr.forEach(file => {
+      //     if (file) {
+      //       const fileNameArr = file.split('/');
+      //       item.fileList.push({
+      //         name: fileNameArr[fileNameArr.length - 1],
+      //         url: file,
+      //       })
+      //     }
+      //   })
+      // })
+
+      tableData.value = records;
       total.value = res.data.data.total
     } else {
       console.error('数据格式不正确', res.data);
@@ -120,11 +152,12 @@ const editManage = async (row) => {
     lastDate: formatTime2(row.lastDate)
   };
   form.value = { ...formattedRow };
-  console.log(form.value)
-  console.log(1111);
+  // console.log(form.value)
+  // console.log(1111);
 }
 const save = () => {
   console.log('保存')
+  form.value.file = JSON.stringify(form.value.file);
   formRef.value.validate(async (valid) => {
     if (valid) {
       // Submit form
@@ -173,7 +206,7 @@ const exp = () => {
 }
 // 选择项
 const handleSelectionChange = (val) => {
-  console.log(val)
+  // console.log(val)
   multipleSelection.value = val
 }
 // 处理分页逻辑
@@ -213,32 +246,40 @@ const handleExcelImportSuccess = async () => {
   getDetailList()
 
 }
-
-// const beforeUpload =async (file) => {
-//   console.log(credit.value.token);
-//   console.log(uploadRef.value);
-//   if (credit.value.token) {
-//     uploadRef.value.headers = {
-//       Authorization: `Bearer ${token}`
-//     };
-//     console.log('token添加成功');
-//   } else {
-//     ElMessage.error('Token 不存在，请重新登录');
-//     return false; // 阻止上传
-//   }
-//   console.log('允许上传');
-//   await ImportService(file)
-//   return true; // 允许上传
-// };
-const error =() => {
-  ElMessage.error('上传失败')
-
+// 上传文件
+const beforeRemove = () => {
+  // ElMessage.error('上传失败')
+  console.log('删除之前');
+}
+const handleRemove = () => {
+  // ElMessage.error('上传失败')
+  console.log('删除之前');
+}
+const handlePreview = (file) => {
+  // ElMessage.error('上传失败')
+  // window.open(url)
+  
+  console.log('下载');
+  console.log(file.uid);
+  window.open(`http://localhost:9090/file/${file.uid}`)
 }
 
-// 上传文件
-const handleSuccess = async () => {
-  await ImportService()
-  ElMessage.success('上传成功')
+const errorMessage = () => {
+  ElMessage.error('上传失败，请联系管理员')
+}
+
+const handleSuccess = (res, file, fileList, index) => {
+  console.log(file);
+  console.log('数组', fileList);
+  form.value.file = [];
+  fileList.forEach((item) => {
+    form.value.file.push({
+      name: item.name,
+      url: item.response,
+    })
+  })
+
+  ElMessage.success('上传成功');
 }
 </script>
 
@@ -281,7 +322,7 @@ const handleSuccess = async () => {
       <el-form-item>
         <!-- :before-upload="beforeUpload" :on-error="error" action="http://localhost:9090/detail/import"-->
         <el-upload action="http://localhost:9090/detail/import" ref="uploadRef" :show-file-list="false" accept="xlsx"
-          :on-success="handleExcelImportSuccess" :before-upload="beforeUpload" style="display: inline-block">
+          :on-success="handleExcelImportSuccess" style="display: inline-block">
           <el-button type="primary" class="ml-5">导入 <i class="el-icon-bottom"></i></el-button>
         </el-upload>
       </el-form-item>
@@ -312,11 +353,12 @@ const handleSuccess = async () => {
         </template>
       </el-table-column>
       <el-table-column prop="file" label="档案材料" width="150">
-        <template #default="{ row }">
-          <el-upload v-model:file-list="fileList" class="upload-demo"
-            action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" multiple :on-remove="handleRemove"
-            :before-remove="beforeRemove" :limit="3" :on-success="handleSuccess">
-            <el-button type="primary">上传文件</el-button>
+        <template #default="{ row, $index }">
+          <el-upload v-model:file-list="row.fileList" class="upload-demo" action="http://localhost:9090/file/upload"
+            :on-preview="handlePreview" :on-error="errorMessage" multiple :on-remove="handleRemove"
+            :before-remove="beforeRemove" :limit="3"
+            :on-success="handleSuccess" show-file-list>
+            <!-- <el-button size="small" type="primary">上传文件</el-button> -->
             <template #tip>
               <div class="el-upload__tip">
               </div>
@@ -367,11 +409,24 @@ const handleSuccess = async () => {
         <el-form-item prop="lastDate" label="到期日期">
           <el-date-picker v-model="form.lastDate" type="date" placeholder="选择日期"></el-date-picker>
         </el-form-item>
+        <el-form-item prop="file" label="文件">
+          <el-upload v-model:file-list="form.fileList" class="upload-demo" action="http://localhost:9090/file/upload"
+            :on-preview="handlePreview" :on-error="errorMessage" multiple :on-remove="handleRemove"
+            :before-remove="beforeRemove" :limit="3" :on-success="handleSuccess" show-file-list>
+            <el-button size="small" type="primary">上传文件</el-button>
+            <template #tip>
+              <div class="el-upload__tip">
+              </div>
+            </template>
+          </el-upload>
+        </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="cancel">取 消</el-button>
-        <el-button type="primary" @click="save">确 定</el-button>
-      </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="cancel">取 消</el-button>
+          <el-button type="primary" @click="save">确 定</el-button>
+        </div>
+      </template>
     </el-dialog>
   </el-card>
 </template>

@@ -54,19 +54,19 @@ const router = useRouter()
 const login = async () => {
   // await form.value.validate()
   const res = await userLoginService(formModel.value)
-  if(res.data && res.data.data ){
+  if (res.data && res.data.data) {
     console.log(res.data.data);
-  // 将token保存到本地
-  userStore.setToken(res.data.data.token)
-  localStorage.setItem("credit_user", JSON.stringify(res.data))  // 存储用户信息到浏览器
-  // 设置用户信息到Pinia
-  userStore.setUser(res.data.data)
-  ElMessage.success('登录成功')
-  router.push('/')
-  } else{
+    // 将token保存到本地
+    userStore.setToken(res.data.data.token)
+    localStorage.setItem("credit_user", JSON.stringify(res.data))  // 存储用户信息到浏览器
+    // 设置用户信息到Pinia
+    userStore.setUser(res.data.data)
+    ElMessage.success('登录成功')
+    router.push('/')
+  } else {
     ElMessage.error(res.msg)
   }
-  
+
 }
 
 watch(isRegister, () => {
@@ -80,7 +80,7 @@ watch(isRegister, () => {
     <el-col :span="6" :offset="3" class="form">
       <!-- 注册表单 -->
       <el-form :model="formModel" :rules="rules" ref="form" size="large" autocomplete="off" v-if="isRegister">
-        <el-form-item>
+        <el-form-item class="h1">
           <h1>注册</h1>
         </el-form-item>
         <el-form-item prop="username">
@@ -104,25 +104,27 @@ watch(isRegister, () => {
         </el-form-item>
       </el-form>
       <!-- 登录表单 -->
-      <!--   -->
+
       <el-form :model="formModel" :rules="rules" ref="form" size="large" autocomplete="off" v-else>
-        <el-form-item>
+        <el-form-item class="h1">
           <h1>登录</h1>
         </el-form-item>
-        <el-form-item prop="username">
+        <el-form-item prop="username" style="margin-top: 10px">
           <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="formModel.username"></el-input>
         </el-form-item>
-        <el-form-item prop="password">
+        <el-form-item prop="password" style="margin-top: 10px">
           <el-input name="password" :prefix-icon="Lock" type="password" placeholder="请输入密码"
             v-model="formModel.password"></el-input>
         </el-form-item>
+        <!--
         <el-form-item class="flex">
           <div class="flex">
             <el-checkbox>记住我</el-checkbox>
             <el-link type="primary" :underline="false">忘记密码？</el-link>
           </div>
         </el-form-item>
-        <el-form-item>
+        -->
+        <el-form-item style="margin-top: 40px">
           <el-button @click="login" class="button" type="primary" auto-insert-space>登录</el-button>
         </el-form-item>
         <el-form-item class="flex">
@@ -153,6 +155,10 @@ watch(isRegister, () => {
     justify-content: center;
     user-select: none;
 
+    h1 {
+      text-align: center;
+    }
+
     .title {
       margin: 0 auto;
     }
@@ -161,11 +167,18 @@ watch(isRegister, () => {
       width: 100%;
     }
 
-    .flex {
+    .el-link {
       width: 100%;
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
+      // margin-left: -100px;
     }
+  }
+
+  :deep(.el-form-item__content) {
+    display: flex;
+    justify-content: center;
+    // align-items: center;
   }
 }
 </style>

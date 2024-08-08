@@ -3,4 +3,4 @@
 
 npm test
 
-pnpm lint
+npm lint

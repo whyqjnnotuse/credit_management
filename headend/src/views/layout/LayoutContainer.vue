@@ -4,11 +4,9 @@ import {
   Promotion,
   Management,
   UserFilled,
-  Crop,
   Avatar,
   List,
   Key,
-  Setting,
   Grid,
   EditPen,
   CaretBottom,
@@ -17,15 +15,18 @@ import {
 import avatar from '@/assets/default.png'
 import { useUserStore } from '@/stores'
 import { useRouter } from 'vue-router'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 const user = ref(localStorage.getItem("credit_user") ? JSON.parse(localStorage.getItem("credit_user")) : {})
-
+// const isCollapse = ref(true);
 const avatarUrl = ref(user.value.data.avatarUrl)
 const userStore = useUserStore()
 const router = useRouter()
-// onMounted(() => {
-//   userStore.getUser()
-// })
+// 根据路由信息计算出 currentPathName
+// const currentPathName = computed(() => {
+//   // 假设你需要从路径中提取最后一个部分作为路径名称
+//   const pathSegments = router.path.split('/');
+//   return pathSegments[pathSegments.length - 1] ;
+// });
 const handleCommand = async (key) => {
   if (key === 'logout') {
     // 弹框
@@ -44,9 +45,10 @@ const handleCommand = async (key) => {
     router.push(`/user/${key}`)
   }
 }
+// const handleCollapse = () => {
+//   isCollapse.value = !isCollapse.value;
+// };
 
-const menus = ref(localStorage.getItem("menus") ? JSON.parse(localStorage.getItem("menus")) : [])
-const opens = ref(localStorage.getItem("menus") ? JSON.parse(localStorage.getItem("menus")).map(v => v.id + '') : [])
 </script>
 <template>
   <el-container class="layout-container">
@@ -114,12 +116,18 @@ const opens = ref(localStorage.getItem("menus") ? JSON.parse(localStorage.getIte
     </el-aside>
     <el-container>
       <el-header>
+        <!-- <el-breadcrumb separator="/" style="display: inline-block; margin-left: 10px">
+          <el-breadcrumb-item
+        v-for="(item, index) in breadcrumbData"
+        :key="item.path"
+      >
+        </el-breadcrumb> -->
         <div>
           <strong>{{
         userStore.user.nickname || userStore.user.username
       }}</strong>
         </div>
-        <el-dropdown placement="bottom-end" @command="handleCommand">
+        <el-dropdown placement="bottom-end" @command="handleCommand">    
           <span class="el-dropdown__box">
             <el-avatar :src="avatarUrl || avatar" />
             <el-icon>
@@ -189,5 +197,32 @@ const opens = ref(localStorage.getItem("menus") ? JSON.parse(localStorage.getIte
     font-size: 14px;
     color: #666;
   }
+
+  .breadcrumb {
+  margin-left: 15px;
+}
+
+.content-header-row {
+  margin-top: -5px;
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap !important;
+}
+
+.breadcrumb-text {
+  font-size: large;
+  font-weight: 500;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
 }
 </style>

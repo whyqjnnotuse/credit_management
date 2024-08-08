@@ -58,7 +58,7 @@ const save = async () => {
   user.value.data = form.value
   console.log(user.value.data);
   localStorage.setItem("credit_user", JSON.stringify(user.value))
-  // localStorage.setItem("credit_user", JSON.stringify(form.value))
+  window.location.reload();
   ElMessage({ type: 'success', message: '更换信息成功' })
   getUser()
 }
