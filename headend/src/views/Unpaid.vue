@@ -123,7 +123,7 @@ const deleteManage = async (row) => {
     confirmButtonText: '确认',
     cancelButtonText: '取消'
   })
-  await DelService(parseInt(row.userCode))
+  await DelService(row.userCode)
   ElMessage({ type: 'success', message: '删除成功' })
   getUnpaidList()
   console.log('删除')

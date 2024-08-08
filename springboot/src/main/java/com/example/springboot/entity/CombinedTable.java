@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Date;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -40,15 +42,15 @@ public class CombinedTable implements Serializable {
 
     private Long contractId;
 
-    private LocalDate handoverTime;
+    private Date handoverTime;
 
     private String LendingInstitution;
 
     private BigDecimal loanAmount;
 
-    private LocalDate loanDate;
+    private Date loanDate;
 
-    private LocalDate lastDate;
+    private Date lastDate;
 
     private String file;
 
